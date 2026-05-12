@@ -1,0 +1,73 @@
+<div *ngIf="data.length === 0" class="flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-dashed border-gray-200">
+  <div class="p-4 bg-gray-50 rounded-full mb-3">
+       <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+  </div>
+  <p class="text-gray-500 font-medium text-lg">No records found</p>
+  <p class="text-gray-400 text-sm">Add a new item to get started</p>
+</div>
+
+<div *ngIf="data.length > 0" class="overflow-x-auto bg-white shadow-xl shadow-gray-200/50 rounded-2xl border border-gray-100 ring-1 ring-black/5">
+  <table class="w-full text-left border-collapse min-w-[800px] lg:min-w-max">
+      <thead>
+          <tr class="bg-gray-50/80 border-b border-gray-200">
+              <th *ngIf="isSelectionEnabled" class="px-6 py-4 w-12">
+                  <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500 cursor-pointer transition-colors"
+                      [checked]="isAllSelected"
+                      [indeterminate]="isIndeterminate"
+                      (change)="handleSelectAll($event)"
+                  />
+              </th>
+              <th *ngFor="let col of columns" class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap" [ngClass]="col.class || ''">
+                  {{ col.header }}
+              </th>
+              <th *ngIf="hasObservers(edit) || hasObservers(delete)" class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 text-right whitespace-nowrap">
+                  Actions
+              </th>
+          </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+          <tr *ngFor="let item of data" 
+              class="group transition-all duration-200 hover:bg-gray-50/60"
+              [ngClass]="isSelected(item) ? 'bg-red-50/40 hover:bg-red-50/60' : ''"
+          >
+              <td *ngIf="isSelectionEnabled" class="px-6 py-4">
+                  <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500 cursor-pointer transition-colors"
+                      [checked]="isSelected(item)"
+                      (change)="handleSelectRow(item[keyField], $event)"
+                  />
+              </td>
+              <td *ngFor="let col of columns" class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                  <ng-container *ngIf="cellTemplate; else defaultCell">
+                      <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: col }"></ng-container>
+                  </ng-container>
+                  <ng-template #defaultCell>
+                      <span *ngIf="col.accessorKey">{{ item[col.accessorKey] }}</span>
+                      <span *ngIf="!col.accessorKey" class="text-gray-400">--</span>
+                  </ng-template>
+              </td>
+              <td *ngIf="hasObservers(edit) || hasObservers(delete)" class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                      <button *ngIf="hasObservers(edit)"
+                          (click)="edit.emit(item)"
+                          class="text-red-600 hover:text-red-900 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                          title="Edit"
+                      >
+                          <lucide-icon [img]="Edit2Icon" [size]="16"></lucide-icon>
+                      </button>
+                      <button *ngIf="hasObservers(delete)"
+                          (click)="delete.emit(item)"
+                          class="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                          title="Delete"
+                      >
+                          <lucide-icon [img]="Trash2Icon" [size]="16"></lucide-icon>
+                      </button>
+                  </div>
+              </td>
+          </tr>
+      </tbody>
+  </table>
+</div>

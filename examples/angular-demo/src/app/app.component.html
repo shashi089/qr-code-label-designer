@@ -1,0 +1,81 @@
+<div class="min-h-screen bg-gray-50">
+  <div *ngIf="!isDesigner" class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40 backdrop-blur-lg bg-white/95">
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="flex flex-col lg:flex-row items-center justify-between py-4 gap-4">
+        <!-- Logo/Brand -->
+        <div class="flex items-center justify-between w-full lg:w-auto">
+          <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-md">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              QR Layout Studio
+            </h1>
+            <p class="text-xs text-gray-500">Management Dashboard</p>
+          </div>
+        </div>
+        </div>
+
+        <!-- Navigation & Actions Container -->
+        <div class="flex items-center w-full lg:w-auto gap-4 overflow-x-auto pb-2 lg:pb-0 hide-scrollbar">
+          <!-- Navigation Tabs -->
+          <nav class="flex gap-2 bg-gray-100 p-1.5 rounded-xl shrink-0 min-w-max">
+            <a
+            routerLink="/"
+            class="flex items-center gap-2 px-4 py-2 font-semibold transition-all duration-200 rounded-lg"
+            [ngClass]="isActive('/', true) ? 'bg-white text-red-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'"
+          >
+            <lucide-icon [img]="HomeIcon" [size]="18"></lucide-icon>
+            <span>Home</span>
+          </a>
+          <a
+            routerLink="/labels"
+            class="flex items-center gap-2 px-4 py-2 font-semibold transition-all duration-200 rounded-lg"
+            [ngClass]="isActive('/labels') ? 'bg-white text-red-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'"
+          >
+            <lucide-icon [img]="TagIcon" [size]="18"></lucide-icon>
+            <span>Labels</span>
+          </a>
+          <a
+            routerLink="/employees"
+            class="flex items-center gap-2 px-5 py-2.5 font-semibold transition-all duration-200 rounded-lg"
+            [ngClass]="isActive('/employees') ? 'bg-white text-red-600 shadow-md' : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'"
+          >
+            <lucide-icon [img]="UsersIcon" [size]="18"></lucide-icon>
+            <span>Employees</span>
+          </a>
+          <a
+            routerLink="/machines"
+            class="flex items-center gap-2 px-4 py-2 font-semibold transition-all duration-200 rounded-lg"
+            [ngClass]="isActive('/machines') ? 'bg-white text-red-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'"
+          >
+            <lucide-icon [img]="CpuIcon" [size]="18"></lucide-icon>
+            <span>Machines</span>
+          </a>
+          <a
+            routerLink="/storage"
+            class="flex items-center gap-2 px-4 py-2 font-semibold transition-all duration-200 rounded-lg"
+            [ngClass]="isActive('/storage') ? 'bg-white text-red-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'"
+          >
+            <lucide-icon [img]="PackageIcon" [size]="18"></lucide-icon>
+            <span>Storage</span>
+          </a>
+        </nav>
+
+        <!-- Actions -->
+        <button
+          (click)="handleReset()"
+          class="shrink-0 text-sm text-red-600 hover:text-red-800 font-medium px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border border-red-100"
+        >
+          Clear Data
+        </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <router-outlet />
+</div>
