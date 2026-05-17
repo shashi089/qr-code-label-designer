@@ -14,6 +14,7 @@ Explore the capabilities of `qrlayout-core` & `qrlayout-ui` through our framewor
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
 | **React** | [Live Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo) |
+| **Angular** | [Live Demo](https://qr-layout-designer-angular.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/angular-demo) |
 | **Svelte 5** | [Live Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
 | **Vue 3** | [Live Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/vue-demo) |
 

@@ -7,6 +7,7 @@ A framework-agnostic, embeddable UI for designing sticker layouts with QR codes.
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
 | **React** | [Live Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo) |
+| **Angular** | [Live Demo](https://qr-layout-designer-angular.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/angular-demo) |
 | **Svelte 5** | [Live Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
 | **Vue 3** | [Live Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/vue-demo) |
 
@@ -202,10 +203,10 @@ onUnmounted(() => {
 <div bind:this={container} style="width: 100%; height: 800px;"></div>
 ```
 
-### 4. Angular (v14+)
+### 4. Angular (v17+ Standalone)
 
 ```typescript
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { QRLayoutDesigner } from 'qrlayout-ui';
 import 'qrlayout-ui/style.css';
 
@@ -214,15 +215,17 @@ import 'qrlayout-ui/style.css';
   selector: 'app-qr-designer',
   template: '<div #container style="width: 100%; height: 800px;"></div>'
 })
-export class QrDesignerComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('container') container!: ElementRef;
+export class QrDesignerComponent implements OnInit, OnDestroy {
+  @ViewChild('container', { static: true }) container!: ElementRef;
   private designer?: QRLayoutDesigner;
 
-  ngAfterViewInit() {
-    this.designer = new QRLayoutDesigner({
-      element: this.container.nativeElement,
-      onSave: (data) => console.log('Saved Layout:', data)
-    });
+  ngOnInit() {
+    if (this.container?.nativeElement) {
+      this.designer = new QRLayoutDesigner({
+        element: this.container.nativeElement,
+        onSave: (data) => console.log('Saved Layout:', data)
+      });
+    }
   }
 
   ngOnDestroy() {
