@@ -1,135 +1,244 @@
 # qrlayout-ui
 
-A framework-agnostic, embeddable UI for designing sticker layouts with QR codes. Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool).
+**An embeddable, framework-agnostic drag-and-drop QR label designer for React, Angular, Vue, Svelte, and plain HTML.**
+
+[![npm version](https://img.shields.io/npm/v/qrlayout-ui.svg)](https://www.npmjs.com/package/qrlayout-ui)
+[![npm downloads](https://img.shields.io/npm/dm/qrlayout-ui.svg)](https://www.npmjs.com/package/qrlayout-ui)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
+[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-layout-generate-tool?style=social)](https://github.com/shashi089/qr-code-layout-generate-tool/stargazers)
+
+Drop a professional label designer into your app in minutes. Supports drag-and-drop element placement, live preview, dark mode, data binding with `{{variables}}`, and layout export to JSON.
+
+Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool) monorepo.
+
+---
 
 ## 🚀 Live Demos & Examples
 
+Try the designer — no signup needed:
+
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
-| **React** | [Live Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo) |
-| **Angular** | [Live Demo](https://qr-layout-designer-angular.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/angular-demo) |
-| **Svelte 5** | [Live Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
-| **Vue 3** | [Live Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/vue-demo) |
+| **React** | [▶ Open Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo) |
+| **Angular** | [▶ Open Demo](https://qr-layout-designer-angular-demo.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/angular-demo) |
+| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
+| **Vue 3** | [▶ Open Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/vue-demo) |
 
 ![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-layout-generate-tool/raw/main/assets/layout_designer.png)
 
+---
 
-## Features
+## ✨ Features
 
-- **Framework Independent**: Built with vanilla TypeScript, works with React, Vue, Angular, Svelte, or plain HTML/JS.
-- **Drag & Drop Designer**: Visual placement of text and QR code elements.
-- **Data Binding**: Bind fields like `{{name}}` or `{{id}}` from your entity schemas.
-- **Rich Text Styling**: Customize font size, weight, and alignment (horizontal/vertical).
-- **Auto-Join Fields**: Set a "Field Separator" (e.g., `|`) on QR elements to automatically join variables (e.g. `{{id}}{{name}}` becomes `ID|NAME`).
-- **Dark Mode**: Built-in support for light and dark themes.
-- **Flexible Units**: Design in millimeters (mm), centimeters (cm), inches (in), or pixels (px).
-- **Export**: Get the final layout JSON for storage.
+- **Framework Independent**: Built with vanilla TypeScript — mount it inside React, Vue, Angular, Svelte, or a plain HTML page.
+- **Drag & Drop Designer**: Visual placement and resizing of text and QR code elements on a canvas.
+- **Live Preview**: Preview your label with real sample data as you design.
+- **Data Binding**: Bind any field like `{{name}}`, `{{id}}`, or `{{department}}` from your entity schema.
+- **Multi-Variable QR**: Set a separator (e.g. `|`) on QR elements to automatically join multiple fields into one scan.
+- **Rich Text Styling**: Customize font family, size, weight, color, and both horizontal and vertical alignment.
+- **Dark Mode**: Built-in light and dark themes that follow your app's color scheme.
+- **Flexible Units**: Design in millimeters, centimeters, inches, or pixels.
+- **JSON Output**: Save the layout as a compact JSON object to your backend or `localStorage`.
+- **Rendering via `qrlayout-core`**: The same layout JSON drives PNG, PDF, and ZPL export — design once, output anywhere.
 
-## Installation
+---
+
+## 📦 Installation
 
 ```bash
 npm install qrlayout-ui qrlayout-core
 ```
 
-## Usage
+---
 
-This library is exposed as a class `QRLayoutDesigner` that can be mounted into any HTML element. It also re-exports `StickerPrinter` for rendering layouts without the UI.
+## 🚀 Getting Started
 
-### 1. Import Styles
+### Step 1 — Import the CSS
 
-Make sure to import the CSS file in your project entry point:
+Add this to your project's entry point (e.g., `main.ts`, `index.js`, `App.tsx`):
 
 ```javascript
 import "qrlayout-ui/style.css";
 ```
 
-### 2. Styling the Container
-
-The designer expects its parent container to have a defined width and height. If the container has zero height, the designer will not be visible. 
-
-For a **full-screen experience**, you can use the following CSS:
-
-```css
-.designer-container {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-}
-```
-
-### 3. Basic Setup
+### Step 2 — Mount the Designer
 
 ```typescript
 import { QRLayoutDesigner } from "qrlayout-ui";
 
-const container = document.getElementById("my-designer-container");
-
 const designer = new QRLayoutDesigner({
-    element: container,
-    
-    // Optional: Provide Schemas for data binding
-    entitySchemas: {
-        employee: {
-            label: "Employee",
-            fields: [
-                { name: "name", label: "Full Name" },
-                { name: "id", label: "Employee ID" }
-            ],
-            sampleData: { name: "Mallikarjun Naik", id: "12345" } // Used for preview
-        }
-    },
+  element: document.getElementById("designer-container"),
 
-    // Optional: Load an existing layout
-    initialLayout: {
-        id: "1",
-        name: "My Layout",
-        targetEntity: "employee",
-        width: 100,
-        height: 60,
-        unit: "mm",
-        backgroundColor: "#ffffff",
-        elements: []
-    },
-
-    onSave: (layout) => {
-        console.log("Layout saved:", layout);
-        // Save to your backend here
+  // Optional: entity schema for {{variable}} data binding
+  entitySchemas: {
+    employee: {
+      label: "Employee",
+      fields: [
+        { name: "name",       label: "Full Name"    },
+        { name: "id",         label: "Employee ID"  },
+        { name: "department", label: "Department"   },
+      ],
+      sampleData: {
+        name: "Alice Johnson",
+        id: "EMP-001",
+        department: "Engineering"
+      }
     }
+  },
+
+  // Optional: load an existing saved layout
+  initialLayout: {
+    id: "1",
+    name: "My Badge",
+    targetEntity: "employee",
+    width: 100,
+    height: 60,
+    unit: "mm",
+    backgroundColor: "#ffffff",
+    elements: []
+  },
+
+  // Fires when the user clicks "Save Layout"
+  onSave: (layout) => {
+    localStorage.setItem("my-layout", JSON.stringify(layout));
+    console.log("Layout saved:", layout);
+  }
 });
 ```
 
-### 4. Cleanup
+### Step 3 — Size the Container
 
-Destroy the instance when the component unmounts to prevent memory leaks:
+The designer fills 100% of its parent element. Give the container a fixed size:
+
+```css
+#designer-container {
+  width: 100%;
+  height: 100vh;   /* full-screen */
+}
+```
+
+Or embed it inside a modal/panel:
+
+```css
+#designer-container {
+  width: 100%;
+  height: 700px;
+}
+```
+
+### Step 4 — Cleanup on Unmount
 
 ```javascript
 designer.destroy();
 ```
 
-## Props / Options
+---
 
-| Option | Type | Description |
-|---|---|---|
-| `element` | `HTMLElement` | **Required**. The DOM element to mount the designer into. |
-| `entitySchemas` | `Record<string, Schema>` | Data entity definitions for `{{field}}` placeholder binding. |
-| `initialLayout` | `StickerLayout` | The initial layout state to load on mount. |
-| `onSave` | `(layout: StickerLayout) => void` | Callback triggered when the "Save Layout" button is clicked. |
+## ⚙️ Options Reference
 
-## Integration Examples
+| Option | Type | Required | Description |
+|---|---|---|---|
+| `element` | `HTMLElement` | ✅ | The DOM element to mount the designer into |
+| `entitySchemas` | `Record<string, Schema>` | ❌ | Entity field definitions for `{{field}}` binding and live preview |
+| `initialLayout` | `StickerLayout` | ❌ | Layout to pre-load on mount |
+| `onSave` | `(layout: StickerLayout) => void` | ❌ | Callback when "Save Layout" is clicked |
 
-Since `qrlayout-ui` is framework-agnostic, it can be easily integrated into any setup.
+---
 
-### 1. React (TypeScript)
+## 💾 Layout Persistence & Printing Workflow
+
+The `onSave` callback gives you the complete layout as a **plain JSON object**. That JSON is your single source of truth — store it anywhere, load it back anytime, and pass it with real data to `qrlayout-core` for printing.
+
+### The Full Cycle
+
+```
+  ┌──────────────────────┐
+  │   qrlayout-ui        │  ← User designs the label visually
+  │   (Designer)         │
+  └──────────┬───────────┘
+             │ onSave(layout JSON)
+             ▼
+  ┌──────────────────────┐
+  │   Your Backend /     │  ← Save layout JSON to your DB, file, or localStorage
+  │   Database           │
+  └──────────┬───────────┘
+             │ Load layout JSON + real employee/machine data
+             ▼
+  ┌──────────────────────┐
+  │   qrlayout-core      │  ← Merge data into template, export PNG / PDF / ZPL
+  │   (StickerPrinter)   │
+  └──────────────────────┘
+```
+
+### Step 1 — Save the Layout to Your Database
+
+```typescript
+const designer = new QRLayoutDesigner({
+  element: document.getElementById("designer"),
+  onSave: async (layout) => {
+    // layout is a plain JSON object — save it wherever you like
+    await fetch("/api/layouts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(layout)
+    });
+  }
+});
+```
+
+### Step 2 — Load the Layout Back (with `initialLayout`)
+
+```typescript
+// Fetch a saved layout from your backend
+const saved = await fetch("/api/layouts/employee-badge").then(r => r.json());
+
+const designer = new QRLayoutDesigner({
+  element: document.getElementById("designer"),
+  initialLayout: saved,   // ← the JSON you saved earlier
+  onSave: (layout) => { /* update in DB */ }
+});
+```
+
+### Step 3 — Print with Real Data (via `qrlayout-core`)
+
+```typescript
+import { StickerPrinter } from "qrlayout-core";
+
+const printer = new StickerPrinter();
+
+// Fetch layout + real records from your backend
+const layout  = await fetch("/api/layouts/employee-badge").then(r => r.json());
+const records = await fetch("/api/employees").then(r => r.json());
+
+// Batch export — one PNG/PDF/ZPL per record
+const zplPages = printer.exportToZPL(layout, records);
+
+// or export as PDF
+const pdf = await printer.exportToPDF(layout, records);
+pdf.save("batch-badges.pdf");
+```
+
+---
+
+> [!NOTE]
+> **About the live demo applications** — The demo apps ([React](https://qr-layout-designer.netlify.app/), [Angular](https://qr-layout-designer-angular-demo.netlify.app/), [Svelte](https://qr-layout-designer-svelte.netlify.app/), [Vue](https://qr-layout-designer-vue.netlify.app/)) ship with a small set of **pre-built sample layouts and employee/machine records** so you can explore all features immediately without any setup.
+>
+> All demo data is stored **exclusively in your browser's `localStorage`**. Nothing is sent to or stored on any server. Clearing your browser storage resets the demo to its defaults. Your designs and data never leave your browser.
+
+---
+
+## 🔌 Integration Examples
+
+
+### React (TypeScript)
 
 ```tsx
 import { useEffect, useRef } from 'react';
 import { QRLayoutDesigner } from 'qrlayout-ui';
 import 'qrlayout-ui/style.css';
 
-const MyDesigner = () => {
+const LabelDesigner = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -137,19 +246,19 @@ const MyDesigner = () => {
 
     const designer = new QRLayoutDesigner({
       element: containerRef.current,
-      onSave: (data) => console.log('Saved Layout:', data)
+      onSave: (layout) => console.log('Saved:', layout)
     });
 
     return () => designer.destroy();
   }, []);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '800px' }} />;
+  return <div ref={containerRef} style={{ width: '100%', height: '100vh' }} />;
 };
 
-export default MyDesigner;
+export default LabelDesigner;
 ```
 
-### 2. Vue 3 (Composition API)
+### Vue 3 (Composition API)
 
 ```vue
 <script setup>
@@ -163,7 +272,7 @@ let designer = null;
 onMounted(() => {
   designer = new QRLayoutDesigner({
     element: container.value,
-    onSave: (data) => console.log('Saved:', data)
+    onSave: (layout) => console.log('Saved:', layout)
   });
 });
 
@@ -173,11 +282,40 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="container" style="width: 100%; height: 800px;"></div>
+  <div ref="container" style="width: 100%; height: 100vh;" />
 </template>
 ```
 
-### 3. Svelte 5 (Runes)
+### Angular (v17+ Standalone Component)
+
+```typescript
+import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { QRLayoutDesigner } from 'qrlayout-ui';
+import 'qrlayout-ui/style.css';
+
+@Component({
+  standalone: true,
+  selector: 'app-label-designer',
+  template: '<div #container style="width: 100%; height: 100vh;"></div>'
+})
+export class LabelDesignerComponent implements OnInit, OnDestroy {
+  @ViewChild('container', { static: true }) container!: ElementRef;
+  private designer?: QRLayoutDesigner;
+
+  ngOnInit() {
+    this.designer = new QRLayoutDesigner({
+      element: this.container.nativeElement,
+      onSave: (layout) => console.log('Saved:', layout)
+    });
+  }
+
+  ngOnDestroy() {
+    this.designer?.destroy();
+  }
+}
+```
+
+### Svelte 5 (Runes)
 
 ```svelte
 <script lang="ts">
@@ -193,96 +331,59 @@ onUnmounted(() => {
 
     designer = new QRLayoutDesigner({
       element: container,
-      onSave: (data) => console.log('Saved Layout:', data)
+      onSave: (layout) => console.log('Saved:', layout)
     });
 
     return () => designer?.destroy();
   });
 </script>
 
-<div bind:this={container} style="width: 100%; height: 800px;"></div>
+<div bind:this={container} style="width: 100%; height: 100vh;" />
 ```
 
-### 4. Angular (v17+ Standalone)
-
-```typescript
-import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
-import { QRLayoutDesigner } from 'qrlayout-ui';
-import 'qrlayout-ui/style.css';
-
-@Component({
-  standalone: true,
-  selector: 'app-qr-designer',
-  template: '<div #container style="width: 100%; height: 800px;"></div>'
-})
-export class QrDesignerComponent implements OnInit, OnDestroy {
-  @ViewChild('container', { static: true }) container!: ElementRef;
-  private designer?: QRLayoutDesigner;
-
-  ngOnInit() {
-    if (this.container?.nativeElement) {
-      this.designer = new QRLayoutDesigner({
-        element: this.container.nativeElement,
-        onSave: (data) => console.log('Saved Layout:', data)
-      });
-    }
-  }
-
-  ngOnDestroy() {
-    this.designer?.destroy();
-  }
-}
-```
-
-### 5. AngularJS (1.x)
-
-```javascript
-import { QRLayoutDesigner } from 'qrlayout-ui';
-import 'qrlayout-ui/style.css';
-
-angular.module('myApp', [])
-  .component('qrLayoutDesigner', {
-    template: '<div class="designer-container" style="width: 100%; height: 800px;"></div>',
-    controller: ['$element', function($element) {
-      let designer;
-
-      this.$onInit = () => {
-        const container = $element[0].querySelector('.designer-container');
-        designer = new QRLayoutDesigner({
-          element: container,
-          onSave: (data) => {
-            console.log('Saved Layout:', data);
-          }
-        });
-      };
-
-      this.$onDestroy = () => {
-        if (designer) designer.destroy();
-      };
-    }]
-  });
-```
-
-### 6. Vanilla JavaScript / HTML
+### Vanilla JavaScript / HTML
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="node_modules/qrlayout-ui/dist/style.css">
+  <link rel="stylesheet" href="node_modules/qrlayout-ui/dist/style.css">
+  <style>
+    #designer { width: 100%; height: 100vh; }
+  </style>
 </head>
 <body>
-    <div id="designer" style="width: 100%; height: 800px;"></div>
+  <div id="designer"></div>
 
-    <script type="module">
-        import { QRLayoutDesigner } from 'qrlayout-ui';
-        
-        const designer = new QRLayoutDesigner({
-            element: document.getElementById('designer'),
-            onSave: (data) => console.log('Saved:', data)
-        });
-    </script>
+  <script type="module">
+    import { QRLayoutDesigner } from 'qrlayout-ui';
+
+    const designer = new QRLayoutDesigner({
+      element: document.getElementById('designer'),
+      onSave: (layout) => {
+        localStorage.setItem('layout', JSON.stringify(layout));
+      }
+    });
+  </script>
 </body>
 </html>
 ```
 
+---
+
+## 🔗 Related
+
+- **[`qrlayout-core`](../core/README.md)** — Use the same layout JSON to render PNG, PDF, or ZPL without the UI
+- **[GitHub Repository](https://github.com/shashi089/qr-code-layout-generate-tool)** — Full monorepo, issue tracker, and discussions
+
+---
+
+## 📄 License
+
+MIT © [Shashidhar Naik](https://github.com/shashi089)
+
+---
+
+<p align="center">
+  <b>If this saved you time, please ⭐ the <a href="https://github.com/shashi089/qr-code-layout-generate-tool">GitHub repository</a> — it helps others find the project!</b>
+</p>

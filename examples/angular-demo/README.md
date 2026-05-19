@@ -1,59 +1,113 @@
-# AngularDemo
+# QR Layout Demo Application (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.25.
+A comprehensive Angular application demonstrating the capabilities of the `qrlayout-ui` and `qrlayout-core` packages. This demo showcases a full-featured QR code badge implementation with design, management, and export capabilities for both employees and machines.
 
-## Development server
+### 🌐 Live Demo
+You can view the live application deployed on Netlify here:
+👉 **[QR Layout Designer - Angular Demo](https://qr-layout-designer-angular-demo.netlify.app/)**
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
+## Features
+
+### 1. Label Designer (`labels/designer`)
+- **Visual Editor**: Drag-and-drop interactive workspace to design custom badge/sticker layouts.
+- **Rich Elements**: Drag, resize, and position labels, QR codes, texts, etc.
+- **Customization**: Fine-tune properties like text content, font size, margins, canvas height/width, padding, and positioning.
+- **Persistence**: Easily save and load layouts locally using `localStorage`.
+
+### 2. Master Data Management
+- **Employee Master**: CRUD operations to manage employee details (Name, ID, Department, Designation, etc.).
+- **Machine Master**: CRUD operations to manage machine profiles (Name, ID, Department, Line, Status, etc.).
+- **Search & Filtering**: Search and filter options to manage large datasets.
+
+### 3. Batch Export & Printing
+- **Template Selection**: Select a custom template layout from your saved designs.
+- **Individual/Batch Print**: Print high-quality labels for a single record or select multiple records for bulk action.
+- **Export Options**:
+    - **PNG**: Download high-resolution badge images.
+    - **PDF**: Generate perfectly aligned printable PDF documents.
+    - **ZPL**: Generate industrial-grade Zebra Programming Language (ZPL) printer code.
+
+### 4. Storage Utility
+- **Backup & Restore**: Export entire local database (layouts, employees, machines) as a JSON file, or restore/import a backup.
+- **Reset Options**: Wipe storage completely or reset to default demo data.
+
+---
+
+## Tech Stack
+- **Framework**: Angular 19 (Standalone components)
+- **Styling**: Tailwind CSS 4 + `@tailwindcss/vite`
+- **Icons**: Lucide Angular
+- **Core Libraries**: `qrlayout-core`, `qrlayout-ui`
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher recommended)
+- `npm`
+
+### Installation
+
+1. Navigate to the project root:
+   ```bash
+   cd examples/angular-demo
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run start
+   ```
+   Open your browser and navigate to `http://localhost:4200/`.
+
+---
+
+## Usage Guide
+
+### Designing a Badge
+1. Navigate to the **"Labels"** tab.
+2. Click **"New Layout"** to launch the designer.
+3. Drag elements onto the canvas and adjust their properties in the sidebar panel.
+4. Click **"Save Layout"** to persist your design.
+
+### Managing Masters
+1. Navigate to the **"Employees"** or **"Machines"** tab.
+2. Use **"Add Employee"** or **"Add Machine"** to input records.
+3. Edit or delete existing records dynamically from the table view.
+
+### Batch Printing
+1. Navigate to either the **"Employees"** or **"Machines"** tab.
+2. Select a **Layout Template** from the dropdown selector at the top.
+3. Check the boxes next to the records you wish to print.
+4. Click **PNG**, **PDF**, or **ZPL** in the bulk actions bar to export the selected badges.
+
+---
+
+## Project Structure
+
+```
+src/app/
+├── components/     # Application views and reusable controls
+│   ├── designer/   # Custom drag-and-drop sticker builder workspace
+│   ├── employees/  # Employee list and forms
+│   ├── home/       # Home dashboard
+│   ├── labels/     # Layout template catalog
+│   ├── machines/   # Machine list and forms
+│   ├── storage/    # Backup, import, and reset utilities
+│   └── table/      # Reusable table control
+├── services/       # Local database and layout services
+├── app.routes.ts   # Client-side SPA routes
+└── app.config.ts   # Configuration provider setup
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## License
+MIT
