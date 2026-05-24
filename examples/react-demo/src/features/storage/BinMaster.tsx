@@ -3,7 +3,7 @@ import { Plus, X, Printer, FileText, Image as ImageIcon, Info } from 'lucide-rea
 import { storage, type Bin } from '../../services/storage';
 import { Table, type Column } from '../../components/Table';
 import { StickerPrinter } from 'qrlayout-core';
-import { exportToPNG, exportToBatchPDF, exportToZPLFile } from '../../services/exportUtils';
+import { exportToPNG, exportToJPG, exportToBatchPDF, exportToZPLFile } from '../../services/exportUtils';
 import type { StickerLayout } from 'qrlayout-ui';
 
 export function BinMaster() {
@@ -95,6 +95,19 @@ export function BinMaster() {
         if (!layout) return;
 
         await exportToPNG({
+            layout,
+            items: selected,
+            printer: printer.current,
+            baseFilename: 'bin-label'
+        });
+    };
+
+    const handleExportJPG = async () => {
+        const layout = getActiveLayout();
+        const selected = getSelectedBins();
+        if (!layout) return;
+
+        await exportToJPG({
             layout,
             items: selected,
             printer: printer.current,
@@ -207,6 +220,15 @@ export function BinMaster() {
                         >
                             <ImageIcon size={16} />
                             PNG
+                        </button>
+                        <button
+                            onClick={handleExportJPG}
+                            disabled={!hasLayout}
+                            className="flex items-center gap-2 bg-white text-gray-700 hover:text-indigo-600 border border-gray-200 hover:border-indigo-200 px-3 py-1.5 rounded-lg text-sm font-medium transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            title="Download as JPG"
+                        >
+                            <ImageIcon size={16} />
+                            JPG
                         </button>
                         <button
                             onClick={handleExportPDF}

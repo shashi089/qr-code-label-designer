@@ -39,6 +39,28 @@ export async function exportToPNG(options: ExportOptions): Promise<void> {
 }
 
 /**
+ * Export selected items as JPG images
+ * Downloads one JPG file per item
+ */
+export async function exportToJPG(options: ExportOptions): Promise<void> {
+    const { layout, items, printer, baseFilename } = options;
+
+    if (!layout || items.length === 0) {
+        console.warn('Cannot export JPG: missing layout or items');
+        return;
+    }
+
+    for (const item of items) {
+        const dataUrl = await printer.renderToDataURL(layout, item, { format: 'jpg', quality: 0.95 });
+
+        const link = document.createElement('a');
+        link.download = `${baseFilename}-${item.id || Date.now()}.jpg`;
+        link.href = dataUrl;
+        link.click();
+    }
+}
+
+/**
  * Export selected items as a single PDF document
  * All items are combined into one PDF file
  */

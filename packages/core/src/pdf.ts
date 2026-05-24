@@ -34,6 +34,14 @@ async function resolveDataUrl(src: string): Promise<string | undefined> {
   }
 }
 
+function mapFontFamily(fontFamily?: string): string {
+  if (!fontFamily) return "helvetica";
+  const lower = fontFamily.toLowerCase();
+  if (lower.includes("serif") || lower.includes("times")) return "times";
+  if (lower.includes("mono") || lower.includes("courier")) return "courier";
+  return "helvetica";
+}
+
 export async function exportToPDF(
   layout: StickerLayout,
   dataList: Record<string, any>[]
@@ -81,6 +89,10 @@ export async function exportToPDF(
         const fontSize = style.fontSize || 12;
         const color = style.color || "#000000";
 
+        const fontFamily = mapFontFamily(style.fontFamily);
+        const fontWeight = (style.fontWeight === "bold" || style.fontWeight === 700) ? "bold" : "normal";
+
+        doc.setFont(fontFamily, fontWeight);
         doc.setFontSize(fontSize);
         doc.setTextColor(color);
 
@@ -96,7 +108,8 @@ export async function exportToPDF(
 
         doc.text(filledContent, drawX, drawY, {
           baseline: vAlign === "middle" ? "middle" : (vAlign === "bottom" ? "bottom" : "top"),
-          align: align as "left" | "center" | "right"
+          align: align as "left" | "center" | "right",
+          maxWidth: w
         });
       }
     }
