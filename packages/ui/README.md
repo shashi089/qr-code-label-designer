@@ -36,7 +36,7 @@ Try the designer — no signup needed:
 - **Live Preview**: Preview your label with real sample data as you design.
 - **Data Binding**: Bind any field like `{{name}}`, `{{id}}`, or `{{department}}` from your entity schema.
 - **Multi-Variable QR**: Set a separator (e.g. `|`) on QR elements to automatically join multiple fields into one scan.
-- **Rich Text Styling**: Customize font family, size, weight, color, and both horizontal and vertical alignment.
+- **Rich Text Styling**: Customize font size, weight, and horizontal/vertical alignment directly in the designer. Font family, color, word-wrap, and line height are supported by the engine and can be set via JSON (`initialLayout` or saved layout) — see the [core README](../core/README.md#stickerelement-schema) for all style properties.
 - **Dark Mode**: Built-in light and dark themes that follow your app's color scheme.
 - **Flexible Units**: Design in millimeters, centimeters, inches, or pixels.
 - **JSON Output**: Save the layout as a compact JSON object to your backend or `localStorage`.
@@ -204,6 +204,7 @@ const designer = new QRLayoutDesigner({
 
 ```typescript
 import { StickerPrinter } from "qrlayout-core";
+import { exportToPDF } from "qrlayout-core/pdf"; // requires: npm install jspdf
 
 const printer = new StickerPrinter();
 
@@ -211,12 +212,22 @@ const printer = new StickerPrinter();
 const layout  = await fetch("/api/layouts/employee-badge").then(r => r.json());
 const records = await fetch("/api/employees").then(r => r.json());
 
-// Batch export — one PNG/PDF/ZPL per record
-const zplPages = printer.exportToZPL(layout, records);
+// ── PNG — one file per record (Blob download) ─────────────────
+for (const record of records) {
+  const blob = await printer.exportToPNG(layout, record);
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement("a"), { href: url, download: `${record.id}.png` });
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
-// or export as PDF
+// ── PDF — all records in one file ────────────────────────────
 const pdf = await printer.exportToPDF(layout, records);
 pdf.save("batch-badges.pdf");
+
+// ── ZPL — for Zebra / thermal printers ───────────────────────
+const zplPages = printer.exportToZPL(layout, records);
+// Send zplPages[0] to your thermal printer via socket or API
 ```
 
 ---
