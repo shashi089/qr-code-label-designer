@@ -36,6 +36,7 @@ See it working in real applications today:
 - 📦 **Mail-Merge Batch Processing**: Define `{{variable}}` placeholders in your template, then generate hundreds of personalized labels in a single call.
 - 🌐 **Runs Everywhere**: Browser (Canvas), Node.js (Buffer), PDF (`jspdf`), or ZPL string — all from the same API.
 - 🔗 **Multi-Variable QR**: Use `qrSeparator` to join multiple fields into one QR code (e.g., `EMP-001|Alice|Engineering`).
+- 📝 **Automatic Word Wrap**: Long text wraps within its element boundary in both PNG and PDF output. Control wrapping per-element with `style.wordWrap` and `style.lineHeight`.
 - ⚡ **Zero UI dependency**: Use this package alone for server-side generation, automations, or CLI tools.
 
 ---
@@ -125,13 +126,17 @@ console.log(zplPages[0]);
 ### 4. Export to PNG (Download)
 
 ```typescript
+// Option A — get a Blob (for download or File API)
 const blob = await printer.exportToPNG(template, data);
-const url = URL.createObjectURL(blob);
-
-const a = document.createElement("a");
-a.href = url;
+const url  = URL.createObjectURL(blob);
+const a    = document.createElement("a");
+a.href     = url;
 a.download = "badge-emp-001.png";
 a.click();
+URL.revokeObjectURL(url);
+
+// Option B — get a data URL string (for <img src> or canvas)
+const dataUrl = await printer.renderToDataURL(template, data, { format: "png" });
 ```
 
 ---
@@ -145,11 +150,69 @@ npm install jspdf
 ```
 
 ```typescript
+// Via the sub-path export (tree-shakeable)
 import { exportToPDF } from "qrlayout-core/pdf";
 
 const pdf = await exportToPDF(template, employees);
 pdf.save("all-badges.pdf");
+
+// Or via the StickerPrinter class
+const pdf = await printer.exportToPDF(template, employees);
+pdf.save("all-badges.pdf");
 ```
+
+> [!NOTE]
+> Text in PDF output automatically wraps within each element's width — the same as PNG.
+> To disable wrapping for a specific element, set `style.wordWrap: false` in that element's style.
+
+---
+
+## 🖨️ ZPL Export (Zebra Printers)
+
+Export directly to ZPL for Zebra and compatible thermal label printers.
+
+> [!IMPORTANT]
+> Always pass the `dpi` option matching your printer's **physical DPI setting**.
+> Using the wrong DPI causes all element positions, widths, heights, and font sizes
+> to print at the wrong scale on the physical label.
+
+```typescript
+import { StickerPrinter } from "qrlayout-core";
+
+const printer = new StickerPrinter();
+
+// 203 DPI — standard desktop Zebra printers (default, no option needed)
+const zpl203 = printer.exportToZPL(template, employees);
+
+// 300 DPI — mid-range / high-quality printers
+const zpl300 = printer.exportToZPL(template, employees, { dpi: 300 });
+
+// 600 DPI with high QR error correction (for harsh environments)
+const zpl600 = printer.exportToZPL(template, employees, { dpi: 600, qrErrorCorrection: "H" });
+
+// Each call returns one ZPL string per record
+console.log(zpl300[0]); // ^XA ... ^PW... ^LL... ^FO... ^XZ
+```
+
+### ZPL Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `dpi` | `number` | `203` | Printer resolution. Must match the printer's physical DPI. Common values: `203`, `300`, `600`. |
+| `qrErrorCorrection` | `L \| M \| Q \| H` | `"M"` | QR code error correction level. `H` recovers ~30% of data; use for labels that may be dirty or worn. |
+
+### Printer Reference
+
+| DPI | `dpmm` | Typical Zebra models |
+|---|---|---|
+| `203` (default) | ~8.0 dots/mm | ZT230, ZD420, GX430t, most desktop models |
+| `300` | ~11.8 dots/mm | ZT410, ZD620, ZD510 |
+| `600` | ~23.6 dots/mm | ZT610, ZT620, ZD621 |
+
+> [!NOTE]
+> **Special characters in data:** If your data contains `^` or `~` characters (ZPL control characters),
+> `exportToZPL()` automatically escapes them using ZPL's `^FH` hex-encoding mechanism.
+> You do not need to sanitize your data before passing it in.
 
 ---
 
@@ -184,6 +247,8 @@ pdf.save("all-badges.pdf");
 | `style.fontFamily` | `string` | ❌ | ❌ JSON only | CSS font family (e.g. `'Inter, sans-serif'`) |
 | `style.color` | `string` | ❌ | ❌ JSON only | Text color (hex, e.g. `'#333333'`) |
 | `style.backgroundColor` | `string` | ❌ | ❌ JSON only | Element background fill color (hex) |
+| `style.wordWrap` | `boolean` | ❌ | ❌ JSON only | Wrap text to next line when it exceeds element width. Default: `true`. Set `false` for forced single-line. |
+| `style.lineHeight` | `number` | ❌ | ❌ JSON only | Line height multiplier relative to `fontSize`. Default: `1.25`. E.g. `1.5` adds more space between lines. |
 
 > [!NOTE]
 > Properties marked **"JSON only"** are fully supported by the rendering engine but are not yet exposed in the `qrlayout-ui` designer panel. Set them directly in the layout JSON when loading via `initialLayout` or when saving/loading from your backend.
@@ -201,18 +266,23 @@ pdf.save("all-badges.pdf");
     textAlign: "center",
     fontFamily: "Inter, sans-serif",   // ← JSON only
     color: "#1a1a2e",                  // ← JSON only
-    backgroundColor: "#f0f4ff"         // ← JSON only
+    backgroundColor: "#f0f4ff",        // ← JSON only
+    wordWrap: true,                    // ← JSON only (default: true)
+    lineHeight: 1.4                    // ← JSON only (default: 1.25)
   }
 }
 ```
 
 ### `StickerPrinter` Methods
 
-| Method | Description |
-|---|---|
-| `renderToCanvas(layout, data, canvas)` | Render a single label onto an HTML Canvas element |
-| `exportToPNG(layout, data)` | Export a single label to a PNG Blob |
-| `exportToZPL(layout, dataArray)` | Batch export labels to an array of ZPL strings |
+| Method | Returns | Description |
+|---|---|---|
+| `renderToCanvas(layout, data, canvas)` | `Promise<void>` | Render a single label onto an existing HTML Canvas element |
+| `renderToDataURL(layout, data, options?)` | `Promise<string>` | Export as a data URL string — use as `<img src>` or pass to canvas. Supports `png`, `jpeg`, `webp`. |
+| `exportToPNG(layout, data, options?)` | `Promise<Blob>` | Export a single label as a PNG `Blob` — ideal for download or the File API |
+| `exportImages(layout, dataList, options?)` | `Promise<string[]>` | Batch-export multiple records as data URL strings (one per record) |
+| `exportToPDF(layout, dataList)` | `Promise<jsPDF>` | Batch-export all records as a multi-page PDF. Requires `jspdf`. |
+| `exportToZPL(layout, dataList, options?)` | `string[]` | Batch-export all records as ZPL strings. Pass `{ dpi: 300 }` to match your printer's resolution. Supports `qrErrorCorrection` and automatic `^`/`~` escaping. |
 
 ---
 
