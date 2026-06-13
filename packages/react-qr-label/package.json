@@ -1,27 +1,26 @@
 {
   "name": "react-qr-label",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An embeddable, visual drag-and-drop QR label designer for React. Generate layouts and export to PDF, PNG, and ZPL formats.",
   "keywords": [
     "qr-code",
     "qr-layout",
     "react-qr-label",
     "react-label-designer",
+    "shipping-label",
+    "inventory-label",
     "label-designer",
     "zpl-printer",
     "sticker-printer",
     "zebra-printer",
     "thermal-printer",
-    "pdf-generator",
     "drag-drop",
     "visual-editor",
-    "barcode-generator",
-    "mail-merge-print",
     "label-generator"
   ],
   "author": "Shashidhar Naik <shashidharnaik8@gmail.com>",
   "license": "MIT",
-  "homepage": "https://react-qr-label-designer.netlify.app/",
+  "homepage": "https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/packages/react-qr-label",
   "bugs": {
     "url": "https://github.com/shashi089/qr-code-layout-generate-tool/issues"
   },
