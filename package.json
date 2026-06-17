@@ -35,6 +35,7 @@
   "scripts": {
     "dev:ui": "npm --workspace packages/ui run dev",
     "dev:react": "npm --workspace examples/react-qr-label-demo run dev",
+    "dev:next": "npm --prefix examples/next-demo run dev",
     "build:core": "npm --workspace packages/core run build",
     "build:ui": "npm --workspace packages/ui run build",
     "build:react": "npm --workspace packages/react-qr-label run build",
