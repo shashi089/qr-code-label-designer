@@ -1,5 +1,7 @@
 import { StickerLayout, StickerElement, StickerData, ImageFormat } from "../layout/schema";
 import { generateQR } from "../qr/generator";
+import { parseContent } from "../utils/parse";
+import { toPx, toDots } from "../utils/units";
 import type { PdfDoc } from "../pdf";
 
 export interface DataUrlOptions {
@@ -45,33 +47,6 @@ export interface ZplOptions {
 
 export class StickerPrinter {
 
-    // ─── Unit Conversion ────────────────────────────────────────────────────────
-
-    /** Convert a layout-unit value to pixels (96 dpi baseline for canvas). */
-    private toPx(value: number, unit: string): number {
-        switch (unit) {
-            case "mm": return (value * 96) / 25.4;
-            case "cm": return (value * 96) / 2.54;
-            case "in": return value * 96;
-            case "px":
-            default:   return value;
-        }
-    }
-
-    // ─── Template Variable Parser ────────────────────────────────────────────────
-
-    /** Replace {{variable}} placeholders in a content string with actual data values. */
-    private parseContent(content: string, data: StickerData, separator?: string): string {
-        let processed = content;
-        if (separator) {
-            processed = processed.replace(/\}\}\s*\{\{/g, `}}${separator}{{`);
-        }
-        return processed.replace(/\{\{(.*?)\}\}/g, (_, key) => {
-            const trimmedKey = key.trim();
-            return data[trimmedKey] !== undefined ? String(data[trimmedKey]) : "";
-        });
-    }
-
     // ─── Canvas Renderer ─────────────────────────────────────────────────────────
 
     /**
@@ -86,8 +61,8 @@ export class StickerPrinter {
         const ctx = canvas.getContext("2d");
         if (!ctx) throw new Error("Canvas context not available");
 
-        canvas.width  = this.toPx(layout.width,  layout.unit);
-        canvas.height = this.toPx(layout.height, layout.unit);
+        canvas.width  = toPx(layout.width,  layout.unit);
+        canvas.height = toPx(layout.height, layout.unit);
 
         // Background
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -101,12 +76,12 @@ export class StickerPrinter {
 
         // Elements
         for (const element of layout.elements) {
-            const x = this.toPx(element.x, layout.unit);
-            const y = this.toPx(element.y, layout.unit);
-            const w = this.toPx(element.w, layout.unit);
-            const h = this.toPx(element.h, layout.unit);
+            const x = toPx(element.x, layout.unit);
+            const y = toPx(element.y, layout.unit);
+            const w = toPx(element.w, layout.unit);
+            const h = toPx(element.h, layout.unit);
 
-            const filledContent = this.parseContent(
+            const filledContent = parseContent(
                 element.content,
                 data,
                 element.type === "qr" ? element.qrSeparator : undefined
@@ -199,13 +174,14 @@ export class StickerPrinter {
         h: number
     ): void {
         const style      = el.style || {};
-        const fontSize   = style.fontSize   || 12;
+        const fontSize   = style.fontSize   || 12;              // pt
+        const fontSizePx = fontSize * (96 / 72);               // pt → px at 96 DPI baseline
         const fontFamily = style.fontFamily || "sans-serif";
         const fontWeight = style.fontWeight || "normal";
-        const lineHeight = fontSize * (style.lineHeight ?? 1.25);
+        const lineHeight = fontSizePx * (style.lineHeight ?? 1.25);
         const shouldWrap = style.wordWrap !== false; // default: true
 
-        ctx.font      = `${fontWeight} ${fontSize}px ${fontFamily}`;
+        ctx.font      = `${fontWeight} ${fontSizePx}px ${fontFamily}`;
         ctx.fillStyle = style.color || "#000";
         ctx.textAlign = (style.textAlign as CanvasTextAlign) || "left";
 
@@ -354,19 +330,6 @@ export class StickerPrinter {
         const dpmm             = dpi / 25.4;             // dots per mm (derived from actual DPI)
         const qrErrorLevel     = options?.qrErrorCorrection ?? "M"; // ZPL ^BQ d-param
 
-        // Convert a value in the layout's unit to printer dots
-        const toDots = (val: number, unit: string): number => {
-            let mm = 0;
-            switch (unit) {
-                case "mm": mm = val; break;
-                case "cm": mm = val * 10; break;
-                case "in": mm = val * 25.4; break;
-                case "px": mm = val * (25.4 / 96); break;
-                default:   mm = val;
-            }
-            return Math.round(mm * dpmm);
-        };
-
         /**
          * Escape content for safe use inside a ZPL ^FD...^FS field.
          *
@@ -390,21 +353,21 @@ export class StickerPrinter {
         };
 
         return dataList.map(data => {
-            const widthDots  = toDots(layout.width,  layout.unit);
-            const heightDots = toDots(layout.height, layout.unit);
+            const widthDots  = toDots(layout.width,  layout.unit, dpmm);
+            const heightDots = toDots(layout.height, layout.unit, dpmm);
 
             let zpl = "^XA\n";
             zpl += `^PW${widthDots}\n`;   // Label print width in dots
             zpl += `^LL${heightDots}\n`;  // Label length in dots
 
             for (const element of layout.elements) {
-                const filledContent = this.parseContent(
+                const filledContent = parseContent(
                     element.content,
                     data,
                     element.type === "qr" ? element.qrSeparator : undefined
                 );
-                const x = toDots(element.x, layout.unit);
-                const y = toDots(element.y, layout.unit);
+                const x = toDots(element.x, layout.unit, dpmm);
+                const y = toDots(element.y, layout.unit, dpmm);
 
                 if (element.type === "text") {
                     const fontSizePt     = element.style?.fontSize || 12;
@@ -420,7 +383,7 @@ export class StickerPrinter {
                     zpl += `^FO${x},${y}^A0N,${fontHeightDots},${fontHeightDots}${prefix}^FD${value}^FS\n`;
 
                 } else if (element.type === "qr") {
-                    const wDots = toDots(element.w, layout.unit);
+                    const wDots = toDots(element.w, layout.unit, dpmm);
 
                     // QR magnification factor (1–10):
                     // A QR Version-1 code is 21x21 modules. The mag factor is

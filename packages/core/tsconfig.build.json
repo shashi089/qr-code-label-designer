@@ -9,6 +9,7 @@
     "src/pdf.ts",
     "src/layout/**/*.ts",
     "src/printer/**/*.ts",
-    "src/qr/**/*.ts"
+    "src/qr/**/*.ts",
+    "src/utils/**/*.ts"
   ]
 }

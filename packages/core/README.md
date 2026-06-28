@@ -240,7 +240,7 @@ console.log(zpl300[0]); // ^XA ... ^PW... ^LL... ^FO... ^XZ
 | `x`, `y` | `number` | ✅ | ✅ Drag on canvas or number inputs | Position from top-left origin (in layout units) |
 | `w`, `h` | `number` | ✅ | ✅ Resize handle or number inputs | Width and height (in layout units) |
 | `qrSeparator` | `string` | ❌ | ✅ "Field Separator" input (QR only) | Joins consecutive `{{variables}}` in a single QR scan |
-| `style.fontSize` | `number` | ❌ | ✅ "Font Size" input (text only) | Font size in pixels |
+| `style.fontSize` | `number` | ❌ | ✅ "Font Size" input (text only) | Font size in **points (pt)**. Consistent across PNG, PDF, and ZPL output. Default: `12`. |
 | `style.fontWeight` | `normal \| bold` | ❌ | ✅ "Font Weight" dropdown (text only) | Font weight |
 | `style.textAlign` | `left \| center \| right` | ❌ | ✅ "Horizontal Align" toggle (text only) | Horizontal text alignment |
 | `style.verticalAlign` | `top \| middle \| bottom` | ❌ | ✅ "Vertical Align" toggle (text only) | Vertical text alignment |

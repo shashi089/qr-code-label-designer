@@ -1,19 +1,9 @@
 import jsPDF from "jspdf";
-import { StickerLayout, StickerData } from "./layout/schema";
+import { StickerLayout } from "./layout/schema";
 import { generateQR } from "./qr/generator";
+import { parseContent } from "./utils/parse";
 
 export type PdfDoc = InstanceType<typeof jsPDF>;
-
-function parseContent(content: string, data: StickerData, separator?: string): string {
-  let processed = content;
-  if (separator) {
-    processed = processed.replace(/\}\}\s*\{\{/g, `}}${separator}{{`);
-  }
-  return processed.replace(/\{\{(.*?)\}\}/g, (_, key) => {
-    const trimmedKey = String(key).trim();
-    return data[trimmedKey] !== undefined ? String(data[trimmedKey]) : "";
-  });
-}
 
 async function resolveDataUrl(src: string): Promise<string | undefined> {
   if (!src) return undefined;

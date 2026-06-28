@@ -286,7 +286,7 @@ type StickerElement = {
   content: string;         // static text OR '{{fieldName}}'
   qrSeparator?: string;    // separator when combining fields: '{{a}}-{{b}}'
   style?: {
-    fontSize?: number;      // px
+    fontSize?: number;      // pt — consistent across PNG, PDF, and ZPL
     fontFamily?: string;
     fontWeight?: string | number; // 'normal' | 'bold' | 400 | 700...
     color?: string;

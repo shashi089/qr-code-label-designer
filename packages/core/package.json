@@ -63,7 +63,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "sideEffects": false,
   "dependencies": {
@@ -74,6 +76,7 @@
   },
   "devDependencies": {
     "@types/qrcode": "^1.5.6",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^2.0.0"
   }
 }
