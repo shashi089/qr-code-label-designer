@@ -37,9 +37,20 @@ export class QRLayoutDesigner {
     private printer: StickerPrinter;
     private onSaveCallback?: (layout: StickerLayout) => void;
 
+    // Phase 1.2: Undo / Redo
+    private undoStack: string[] = [];
+    private redoStack: string[] = [];
+    private readonly MAX_UNDO = 20;
+
+    // Phase 1.2: Snap-to-grid
+    private snapToGrid = false;
+    private readonly GRID_SIZE = 1; // in current layout units
+
+    // Phase 1.2: Keyboard handler reference for cleanup
+    private _keyHandler!: (e: KeyboardEvent) => void;
+
     // DOM Elements
     private canvas!: HTMLCanvasElement;
-
     private editorOverlay!: HTMLDivElement;
     private elementsContainer!: HTMLDivElement;
     private propertyPanel!: HTMLDivElement;
@@ -47,6 +58,8 @@ export class QRLayoutDesigner {
     private leftSidebar!: HTMLElement;
     private rightSidebar!: HTMLElement;
     private sampleDataContainer!: HTMLDivElement;
+    private undoBtn!: HTMLButtonElement;
+    private redoBtn!: HTMLButtonElement;
 
     // Inputs
     private inputs!: {
@@ -68,7 +81,6 @@ export class QRLayoutDesigner {
         this.onSaveCallback = options.onSave;
         this.entitySchemas = options.entitySchemas || {};
 
-        // Default Layout if not provided
         this.currentLayout = (options.initialLayout as DesignerLayout) || {
             id: "layout-" + Date.now(),
             name: "New Layout",
@@ -86,7 +98,7 @@ export class QRLayoutDesigner {
     private init() {
         this.renderTemplate();
         this.cacheDOM();
-        this.renderEntityOptions(); // New method to populate select
+        this.renderEntityOptions();
         this.syncInputsFromLayout();
         this.bindEvents();
         this.renderSampleDataEditor();
@@ -99,7 +111,14 @@ export class QRLayoutDesigner {
         this.container.innerHTML = `
         <header>
             <div data-el="header-left"></div>
-            <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="btn btn-icon btn-outline" data-el="undo-btn" data-action="undo" title="Undo (Ctrl+Z)" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+                </button>
+                <button class="btn btn-icon btn-outline" data-el="redo-btn" data-action="redo" title="Redo (Ctrl+Y)" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
+                </button>
+                <div style="width: 1px; height: 24px; background: var(--border-color);"></div>
                 <button class="btn btn-icon btn-outline" data-action="toggle-theme" title="Toggle Dark Mode">
                     <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
                     <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
@@ -124,6 +143,19 @@ export class QRLayoutDesigner {
                         <div class="form-group">
                             <label>Internal Layout Name</label>
                             <input type="text" data-input="name" placeholder="Standard Badge" />
+                        </div>
+                        <div class="form-group">
+                            <label>Size Preset</label>
+                            <select data-input="preset">
+                                <option value="">Custom</option>
+                                <option value="100x60mm">Badge — 100 × 60 mm</option>
+                                <option value="100x50mm">EU Standard — 100 × 50 mm</option>
+                                <option value="50x25mm">Mini Tag — 50 × 25 mm</option>
+                                <option value="62x29mm">Brother QL — 62 × 29 mm</option>
+                                <option value="4x6in">Shipping Label — 4" × 6"</option>
+                                <option value="3x2in">Asset Tag — 3" × 2"</option>
+                                <option value="2x1in">Small Label — 2" × 1"</option>
+                            </select>
                         </div>
                         <div class="form-row">
                             <div class="form-group" style="flex: 1">
@@ -179,6 +211,14 @@ export class QRLayoutDesigner {
                     <button id="toggle-left" class="sidebar-toggle" title="Toggle Settings">☰</button>
                     <button id="toggle-right" class="sidebar-toggle" title="Toggle Properties" style="display: none;">✎</button>
 
+                    <div class="canvas-toolbar">
+                        <label class="snap-grid-label" title="Snap elements to a 1-unit grid while dragging">
+                            <input type="checkbox" data-action="toggle-grid" />
+                            <span>Snap to Grid</span>
+                        </label>
+                        <span class="canvas-toolbar-hint">Del — delete · Arrow — nudge · Shift+Arrow — nudge 5x · Ctrl+D — duplicate</span>
+                    </div>
+
                     <div class="canvas-wrapper">
                         <canvas data-el="preview-canvas"></canvas>
                         <div data-el="editor-overlay" class="editor-overlay"></div>
@@ -228,6 +268,8 @@ export class QRLayoutDesigner {
         this.propContent = q('[data-el="prop-content"]') as HTMLDivElement;
         this.leftSidebar = q('.sidebar');
         this.rightSidebar = q('.sidebar-right');
+        this.undoBtn = q('[data-el="undo-btn"]') as HTMLButtonElement;
+        this.redoBtn = q('[data-el="redo-btn"]') as HTMLButtonElement;
 
         this.inputs = {
             entity: qi('entity'),
@@ -246,7 +288,6 @@ export class QRLayoutDesigner {
 
     private renderEntityOptions() {
         const select = this.inputs.entity;
-        // Keep the first default option "Select Entity..."
         while (select.options.length > 1) {
             select.remove(1);
         }
@@ -263,7 +304,6 @@ export class QRLayoutDesigner {
     private syncInputsFromLayout() {
         this.inputs.entity.value = this.currentLayout.targetEntity || "";
         this.inputs.name.value = this.currentLayout.name;
-        // Updated: Removed .toFixed(2) to show clean integers like 100 instead of 100.00
         this.inputs.width.value = String(this.currentLayout.width);
         this.inputs.height.value = String(this.currentLayout.height);
         this.inputs.unit.value = this.currentLayout.unit;
@@ -277,6 +317,10 @@ export class QRLayoutDesigner {
     }
 
     private bindEvents() {
+        // Undo / Redo buttons
+        this.undoBtn.addEventListener('click', () => this.undo());
+        this.redoBtn.addEventListener('click', () => this.redo());
+
         // Global Buttons
         this.container.querySelector('[data-action="toggle-theme"]')?.addEventListener('click', (e) => {
             this.isDarkMode = !this.isDarkMode;
@@ -362,6 +406,7 @@ export class QRLayoutDesigner {
 
         // Element Actions
         this.container.querySelector('[data-action="add-text"]')?.addEventListener('click', () => {
+            this.snapshot();
             const id = "t" + Date.now();
             this.currentLayout.elements.push({ id, type: 'text', x: 10, y: 10, w: 40, h: 10, content: "New Text" });
             this.selectElement(id);
@@ -369,6 +414,7 @@ export class QRLayoutDesigner {
         });
 
         this.container.querySelector('[data-action="add-qr"]')?.addEventListener('click', () => {
+            this.snapshot();
             const id = "q" + Date.now();
             this.currentLayout.elements.push({ id, type: 'qr', x: 5, y: 5, w: 20, h: 20, content: "{{id}}" });
             this.selectElement(id);
@@ -376,10 +422,52 @@ export class QRLayoutDesigner {
         });
 
         this.container.querySelector('[data-action="delete-element"]')?.addEventListener('click', () => {
-            this.currentLayout.elements = this.currentLayout.elements.filter(e => e.id !== this.selectedElementId);
-            this.selectElement(null);
-            this.updatePreview();
+            this.deleteSelectedElement();
         });
+
+        // Snap to grid toggle
+        this.container.querySelector('[data-action="toggle-grid"]')?.addEventListener('change', (e) => {
+            this.snapToGrid = (e.target as HTMLInputElement).checked;
+            this.updateEditorOverlay();
+        });
+
+        // Size preset
+        const presetSelect = this.container.querySelector('[data-input="preset"]') as HTMLSelectElement;
+        presetSelect?.addEventListener('change', (e) => {
+            const val = (e.target as HTMLSelectElement).value;
+            if (val) {
+                this.applyPreset(val);
+                (e.target as HTMLSelectElement).value = "";
+            }
+        });
+
+        // Keyboard shortcuts
+        this._keyHandler = (e: KeyboardEvent) => {
+            const tag = (document.activeElement as HTMLElement)?.tagName;
+            const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
+            if (isInput) return;
+
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault(); this.undo(); return;
+            }
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+                e.preventDefault(); this.redo(); return;
+            }
+            if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedElementId) {
+                e.preventDefault(); this.deleteSelectedElement(); return;
+            }
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key) && this.selectedElementId) {
+                e.preventDefault(); this.nudgeSelected(e.key, e.shiftKey ? 5 : 1); return;
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd' && this.selectedElementId) {
+                e.preventDefault(); this.duplicateSelected(); return;
+            }
+            if (e.key === 'Escape') {
+                this.selectElement(null); return;
+            }
+        };
+        document.addEventListener('keydown', this._keyHandler);
 
         // Resize observer to handle responsiveness
         new ResizeObserver(() => {
@@ -394,13 +482,11 @@ export class QRLayoutDesigner {
     public async updatePreview() {
         if (!this.canvas || !this.currentLayout) return;
 
-        // Use sample data based on entity and provided schemas
         const sampleData = (this.currentLayout.targetEntity && this.entitySchemas[this.currentLayout.targetEntity])
             ? this.entitySchemas[this.currentLayout.targetEntity].sampleData
             : {};
 
-        // renderToCanvas resets canvas.width/height which triggers a browser reflow.
-        // Skipping it during drag prevents other elements from shaking.
+        // Skipping canvas re-render during drag prevents other elements from shaking.
         if (!this.isDragging) {
             await this.printer.renderToCanvas(this.currentLayout, sampleData, this.canvas);
             const rect = this.canvas.getBoundingClientRect();
@@ -491,7 +577,6 @@ export class QRLayoutDesigner {
         this.renderPropertyPanel();
         this.updateEditorOverlay();
 
-        // Auto-show right sidebar on mobile if an element is selected
         if (id && this.container.offsetWidth <= 768) {
             this.rightSidebar.classList.add("show");
         }
@@ -517,6 +602,32 @@ export class QRLayoutDesigner {
 
         this.propertyPanel.style.display = "block";
         this.propContent.innerHTML = `
+            <!-- Alignment Toolbar -->
+            <div class="align-toolbar">
+                <span class="align-toolbar-label">Align to Label</span>
+                <div class="align-toolbar-btns">
+                    <button class="btn btn-icon btn-outline align-btn" data-align="left" title="Align Left Edge" style="width:28px;height:28px;">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="6" height="8" rx="1"/><line x1="1" y1="1" x2="1" y2="13"/></svg>
+                    </button>
+                    <button class="btn btn-icon btn-outline align-btn" data-align="center-h" title="Center Horizontally" style="width:28px;height:28px;">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="6" height="8" rx="1"/><line x1="7" y1="1" x2="7" y2="13"/></svg>
+                    </button>
+                    <button class="btn btn-icon btn-outline align-btn" data-align="right" title="Align Right Edge" style="width:28px;height:28px;">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="3" width="6" height="8" rx="1"/><line x1="13" y1="1" x2="13" y2="13"/></svg>
+                    </button>
+                    <div class="align-sep"></div>
+                    <button class="btn btn-icon btn-outline align-btn" data-align="top" title="Align Top Edge" style="width:28px;height:28px;">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="8" height="6" rx="1"/><line x1="1" y1="1" x2="13" y2="1"/></svg>
+                    </button>
+                    <button class="btn btn-icon btn-outline align-btn" data-align="center-v" title="Center Vertically" style="width:28px;height:28px;">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="8" height="6" rx="1"/><line x1="1" y1="7" x2="13" y2="7"/></svg>
+                    </button>
+                    <button class="btn btn-icon btn-outline align-btn" data-align="bottom" title="Align Bottom Edge" style="width:28px;height:28px;">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="8" height="6" rx="1"/><line x1="1" y1="13" x2="13" y2="13"/></svg>
+                    </button>
+                </div>
+            </div>
+
             <div class="form-group">
                 ${el.type === 'qr' ? `
                 <label>Field Separator</label>
@@ -568,7 +679,14 @@ export class QRLayoutDesigner {
             ` : ''}
         `;
 
-        // Suggestions from Props (using this.entitySchemas)
+        // Alignment toolbar buttons
+        this.propContent.querySelectorAll('.align-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.alignElement((btn as HTMLElement).dataset.align!);
+            });
+        });
+
+        // Suggestions from Props
         const suggestions = this.propContent.querySelector('[data-el="field-suggestions"]');
         const entitySchema = this.currentLayout.targetEntity ? this.entitySchemas[this.currentLayout.targetEntity] : null;
 
@@ -586,7 +704,7 @@ export class QRLayoutDesigner {
             });
         }
 
-        // Listeners for props
+        // QR separator
         const sepInput = this.propContent.querySelector("#prop-qr-separator");
         if (sepInput) {
             sepInput.addEventListener("input", (e) => {
@@ -595,14 +713,20 @@ export class QRLayoutDesigner {
             });
         }
 
+        // Property inputs — live update on input, snapshot on blur (focus captures state before editing)
         const link = (key: string, field: string, isNum = false, subField?: string) => {
-            const input = this.propContent.querySelector(`[data-prop="${key}"]`);
+            const input = this.propContent.querySelector(`[data-prop="${key}"]`) as HTMLInputElement | null;
             if (!input) return;
+
+            let preEditState: string | null = null;
+
+            input.addEventListener("focus", () => {
+                preEditState = JSON.stringify(this.currentLayout);
+            });
 
             input.addEventListener("input", (e) => {
                 const val = (e.target as HTMLInputElement).value;
                 const finalVal = isNum ? parseFloat(val) || 0 : val;
-
                 if (subField) {
                     if (!el.style) el.style = {};
                     (el.style as any)[subField] = finalVal;
@@ -610,6 +734,16 @@ export class QRLayoutDesigner {
                     (el as any)[field] = finalVal;
                 }
                 this.updatePreview();
+            });
+
+            input.addEventListener("blur", () => {
+                if (preEditState !== null) {
+                    this.undoStack.push(preEditState);
+                    if (this.undoStack.length > this.MAX_UNDO) this.undoStack.shift();
+                    this.redoStack = [];
+                    this.updateUndoButtons();
+                    preEditState = null;
+                }
             });
         };
 
@@ -623,6 +757,7 @@ export class QRLayoutDesigner {
 
         this.propContent.querySelectorAll(".prop-align-h").forEach(btn => {
             btn.addEventListener("click", () => {
+                this.snapshot();
                 if (!el.style) el.style = {};
                 el.style.textAlign = (btn as HTMLElement).dataset.val as any;
                 this.renderPropertyPanel();
@@ -632,6 +767,7 @@ export class QRLayoutDesigner {
 
         this.propContent.querySelectorAll(".prop-align-v").forEach(btn => {
             btn.addEventListener("click", () => {
+                this.snapshot();
                 if (!el.style) el.style = {};
                 el.style.verticalAlign = (btn as HTMLElement).dataset.val as any;
                 this.renderPropertyPanel();
@@ -643,10 +779,18 @@ export class QRLayoutDesigner {
     private updateEditorOverlay() {
         if (!this.editorOverlay || !this.canvas) return;
 
-        // Only update overlay dimensions when not dragging (canvas size is stable)
         if (!this.isDragging) {
             this.editorOverlay.style.width = this.canvas.style.width;
             this.editorOverlay.style.height = this.canvas.style.height;
+        }
+
+        // Update grid dots visual
+        if (this.snapToGrid && this.pxPerUnit > 0) {
+            const dotSpacing = this.GRID_SIZE * this.pxPerUnit;
+            this.editorOverlay.style.setProperty('--grid-dot-spacing', `${dotSpacing}px`);
+            this.editorOverlay.classList.add('show-grid');
+        } else {
+            this.editorOverlay.classList.remove('show-grid');
         }
 
         // Reconcile DOM: remove stale items, keep existing ones
@@ -659,7 +803,6 @@ export class QRLayoutDesigner {
             let item = this.editorOverlay.querySelector(`.editor-item[data-id="${el.id}"]`) as HTMLElement | null;
 
             if (!item) {
-                // Create once, attach listeners once
                 item = document.createElement("div");
                 item.className = "editor-item";
                 item.dataset.id = el.id;
@@ -684,7 +827,6 @@ export class QRLayoutDesigner {
                 this.editorOverlay.appendChild(item);
             }
 
-            // Sync state
             item.classList.toggle("selected", this.selectedElementId === el.id);
             item.style.left = `${el.x * this.pxPerUnit}px`;
             item.style.top = `${el.y * this.pxPerUnit}px`;
@@ -694,23 +836,25 @@ export class QRLayoutDesigner {
     }
 
     private startElementResize(e: MouseEvent, el: StickerElement, item: HTMLElement) {
+        this.snapshot();
         this.isDragging = true;
         const startX = e.clientX;
         const startY = e.clientY;
         const initW = el.w;
         const initH = el.h;
 
+        const snap = (val: number) =>
+            this.snapToGrid ? Math.round(val / this.GRID_SIZE) * this.GRID_SIZE : val;
+
         const onMove = (me: MouseEvent) => {
-            el.w = Math.max(1, initW + (me.clientX - startX) / this.pxPerUnit);
-            el.h = Math.max(1, initH + (me.clientY - startY) / this.pxPerUnit);
-            // Only update THIS element's box — no canvas reset, no other elements affected
+            el.w = snap(Math.max(this.GRID_SIZE, initW + (me.clientX - startX) / this.pxPerUnit));
+            el.h = snap(Math.max(this.GRID_SIZE, initH + (me.clientY - startY) / this.pxPerUnit));
             item.style.width = `${el.w * this.pxPerUnit}px`;
             item.style.height = `${el.h * this.pxPerUnit}px`;
             this.renderPropertyPanel();
         };
         const onUp = () => {
             this.isDragging = false;
-            // Full canvas re-render only after drag ends
             this.updatePreview();
             this.renderPropertyPanel();
             window.removeEventListener("mousemove", onMove);
@@ -721,23 +865,25 @@ export class QRLayoutDesigner {
     }
 
     private startElementDrag(e: MouseEvent, el: StickerElement, item: HTMLElement) {
+        this.snapshot();
         this.isDragging = true;
         const startX = e.clientX;
         const startY = e.clientY;
         const initX = el.x;
         const initY = el.y;
 
+        const snap = (val: number) =>
+            this.snapToGrid ? Math.round(val / this.GRID_SIZE) * this.GRID_SIZE : val;
+
         const onMove = (me: MouseEvent) => {
-            el.x = initX + (me.clientX - startX) / this.pxPerUnit;
-            el.y = initY + (me.clientY - startY) / this.pxPerUnit;
-            // Only update THIS element's box — no canvas reset, no other elements affected
+            el.x = snap(initX + (me.clientX - startX) / this.pxPerUnit);
+            el.y = snap(initY + (me.clientY - startY) / this.pxPerUnit);
             item.style.left = `${el.x * this.pxPerUnit}px`;
             item.style.top = `${el.y * this.pxPerUnit}px`;
             this.renderPropertyPanel();
         };
         const onUp = () => {
             this.isDragging = false;
-            // Full canvas re-render only after drag ends
             this.updatePreview();
             this.renderPropertyPanel();
             window.removeEventListener("mousemove", onMove);
@@ -748,8 +894,125 @@ export class QRLayoutDesigner {
     }
 
     public destroy() {
+        document.removeEventListener('keydown', this._keyHandler);
         this.container.innerHTML = "";
         this.container.classList.remove("qrlayout-designer");
-        // Additional cleanup if necessary
+    }
+
+    // ── Phase 1.2: Undo / Redo ────────────────────────────────────────────────
+
+    private snapshot(): void {
+        this.undoStack.push(JSON.stringify(this.currentLayout));
+        if (this.undoStack.length > this.MAX_UNDO) this.undoStack.shift();
+        this.redoStack = [];
+        this.updateUndoButtons();
+    }
+
+    private undo(): void {
+        if (this.undoStack.length === 0) return;
+        this.redoStack.push(JSON.stringify(this.currentLayout));
+        this.currentLayout = JSON.parse(this.undoStack.pop()!);
+        this.selectedElementId = null;
+        this.syncInputsFromLayout();
+        this.renderSampleDataEditor();
+        this.renderElementsList();
+        this.renderPropertyPanel();
+        this.updatePreview();
+        this.updateUndoButtons();
+    }
+
+    private redo(): void {
+        if (this.redoStack.length === 0) return;
+        this.undoStack.push(JSON.stringify(this.currentLayout));
+        this.currentLayout = JSON.parse(this.redoStack.pop()!);
+        this.selectedElementId = null;
+        this.syncInputsFromLayout();
+        this.renderSampleDataEditor();
+        this.renderElementsList();
+        this.renderPropertyPanel();
+        this.updatePreview();
+        this.updateUndoButtons();
+    }
+
+    private updateUndoButtons(): void {
+        if (this.undoBtn) this.undoBtn.disabled = this.undoStack.length === 0;
+        if (this.redoBtn) this.redoBtn.disabled = this.redoStack.length === 0;
+    }
+
+    // ── Phase 1.2: Keyboard Shortcut Actions ─────────────────────────────────
+
+    private nudgeSelected(key: string, step: number): void {
+        const el = this.currentLayout.elements.find(e => e.id === this.selectedElementId);
+        if (!el) return;
+        this.snapshot();
+        if (key === 'ArrowLeft')  el.x = Math.max(0, el.x - step);
+        if (key === 'ArrowRight') el.x += step;
+        if (key === 'ArrowUp')    el.y = Math.max(0, el.y - step);
+        if (key === 'ArrowDown')  el.y += step;
+        this.updatePreview();
+        this.renderPropertyPanel();
+    }
+
+    private duplicateSelected(): void {
+        const el = this.currentLayout.elements.find(e => e.id === this.selectedElementId);
+        if (!el) return;
+        this.snapshot();
+        const newEl: StickerElement = {
+            ...el,
+            id: el.type[0] + Date.now(),
+            x: el.x + this.GRID_SIZE * 5,
+            y: el.y + this.GRID_SIZE * 5
+        };
+        this.currentLayout.elements.push(newEl);
+        this.selectElement(newEl.id);
+        this.updatePreview();
+    }
+
+    private deleteSelectedElement(): void {
+        if (!this.selectedElementId) return;
+        this.snapshot();
+        this.currentLayout.elements = this.currentLayout.elements.filter(e => e.id !== this.selectedElementId);
+        this.selectElement(null);
+        this.updatePreview();
+    }
+
+    // ── Phase 1.2: Element Alignment ─────────────────────────────────────────
+
+    private alignElement(direction: string): void {
+        const el = this.currentLayout.elements.find(e => e.id === this.selectedElementId);
+        if (!el) return;
+        this.snapshot();
+        const { width, height } = this.currentLayout;
+        switch (direction) {
+            case 'left':     el.x = 0; break;
+            case 'center-h': el.x = (width - el.w) / 2; break;
+            case 'right':    el.x = width - el.w; break;
+            case 'top':      el.y = 0; break;
+            case 'center-v': el.y = (height - el.h) / 2; break;
+            case 'bottom':   el.y = height - el.h; break;
+        }
+        this.updatePreview();
+        this.renderPropertyPanel();
+    }
+
+    // ── Phase 1.2: Label Size Presets ─────────────────────────────────────────
+
+    private applyPreset(value: string): void {
+        const presets: Record<string, { width: number; height: number; unit: 'mm' | 'in' | 'cm' | 'px' }> = {
+            '100x60mm': { width: 100, height: 60,  unit: 'mm' },
+            '100x50mm': { width: 100, height: 50,  unit: 'mm' },
+            '50x25mm':  { width: 50,  height: 25,  unit: 'mm' },
+            '62x29mm':  { width: 62,  height: 29,  unit: 'mm' },
+            '4x6in':    { width: 4,   height: 6,   unit: 'in' },
+            '3x2in':    { width: 3,   height: 2,   unit: 'in' },
+            '2x1in':    { width: 2,   height: 1,   unit: 'in' },
+        };
+        const preset = presets[value];
+        if (!preset) return;
+        this.currentLayout.width = preset.width;
+        this.currentLayout.height = preset.height;
+        this.currentLayout.unit = preset.unit;
+        this.syncInputsFromLayout();
+        this.updatePreview();
     }
 }
