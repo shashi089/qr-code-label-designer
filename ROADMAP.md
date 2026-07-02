@@ -4,6 +4,19 @@
 
 ---
 
+## Progress Overview
+
+| Phase | Title | Status |
+|-------|-------|--------|
+| **1.1** | Core Engine Hardening | ✅ Complete |
+| **1.2** | Designer UX — Must-Fix Issues | ✅ Complete |
+| **1.3** | Developer Experience Improvements | 🔲 Pending |
+| **2** | Feature Completeness | 🔲 Pending |
+| **3** | Desktop Application | 🔲 Pending |
+| **4** | Ecosystem & Community | 🔲 Pending |
+
+---
+
 ## Understanding the Template Concept
 
 Before the roadmap, here is a plain-English explanation of how the system works.
@@ -91,74 +104,90 @@ qr-code-layout-generate-tool/ (this repo)
 
 ---
 
-## Phase 1 — Solid Foundation  *(v1.2 — Current focus)*
+## Phase 1 — Solid Foundation *(v1.2 — Current focus)*
 
 **Goal:** Make the existing packages reliable, well-tested, and easy to adopt. Everything in Phase 2 and beyond depends on this being stable.
 
 ---
 
-### 1.1 — Core Engine Hardening
+### 1.1 — Core Engine Hardening ✅ Complete
 
-- [ ] **Unit test suite for `qrlayout-core`**
-  - Test `parseContent()` with single var, multi-var, missing var, nested `{{}}`, empty string
-  - Test `toPx()` unit conversion for all 4 units (mm, cm, in, px)
-  - Test `exportToZPL()` — verify `^FO`, `^A0N`, `^BQN` commands for both element types
-  - Test `exportToPDF()` — verify page count matches record count
-  - Tool: `vitest` (zero-config, works with existing Vite setup)
+- [x] **Unit test suite for `qrlayout-core`**
+  - 54 tests across 3 files using `vitest`
+  - `parse.test.ts` — 15 tests: `parseContent()` single/multi var, missing key, whitespace trim, zero/false values, separator injection
+  - `units.test.ts` — 16 tests: `toPx()` and `toDots()` for all 4 units at 203 and 300 DPI
+  - `zpl.test.ts` — 23 tests: ZPL structure, dot calculations, text/QR commands, `^FH` escaping, DPI scaling, multi-record, unit equivalence
 
-- [ ] **Fix `react-qr-label-designer` package** — it exists as a folder but is not published to npm. Either publish it or remove the folder to avoid confusion.
+- [x] **`parseContent` and `toPx`/`toDots` extracted into `src/utils/`**
+  - `src/utils/parse.ts` — shared by both `StickerPrinter` and `pdf.ts` (was duplicated)
+  - `src/utils/units.ts` — pure functions, exported from the package
 
-- [ ] **TSDoc comments on all public APIs**
-  - `StickerPrinter` methods: `renderToDataURL`, `exportToPNG`, `exportToZPL`, `exportToPDF`
-  - `QRLayoutDesigner` constructor options
-  - All exported interfaces in `schema.ts`
-  - Benefit: inline autocomplete docs in VS Code, no need to open README
+- [x] **`fontSize` pt/px inconsistency fixed**
+  - Canvas renderer now converts pt → px using `fontSize * (96/72)` — matches PDF and ZPL output scale
+  - All three renderers (Canvas PNG, PDF, ZPL) now consistently treat `fontSize` as **points (pt)**
 
-- [ ] **`CHANGELOG.md`** — Start tracking changes per version. Follow Keep a Changelog format.
+- [x] **TSDoc comments on all public APIs**
+  - All interfaces and types in `schema.ts` fully documented
+  - `StickerPrinter` methods already had TSDoc — retained and improved
 
-- [ ] **GitHub Actions CI** — Run `tsc --noEmit` + tests on every PR to `main`. Add badge to README.
+- [x] **`CHANGELOG.md`** created at repo root with full version history
+
+- [x] **GitHub Actions CI** (`.github/workflows/ci.yml`)
+  - Runs on every push and PR to `main`
+  - Steps: install → build core → type-check ui + react-qr-label → run tests
+
+- [x] **Removed orphaned `packages/react-qr-label-designer`** folder (no source code; only stale build artefacts)
+
+- [x] **`test` / `test:watch` scripts** added to `packages/core/package.json`
+
+- [x] **`test:core` script** added to root `package.json`
 
 ---
 
-### 1.2 — Designer UX — Must-Fix Issues
+### 1.2 — Designer UX — Must-Fix Issues ✅ Complete
 
-These are the issues that cause users to abandon the designer in the first 5 minutes.
+- [x] **Undo / Redo** (`Ctrl+Z` / `Ctrl+Y`)
+  - 20-step snapshot stack; undo/redo buttons in header (disabled when stack is empty)
+  - Covers: add, delete, drag, resize, duplicate, nudge, align, text-align, style changes
+  - Property inputs use focus/blur pattern: snapshot captured when field is focused, pushed on blur
 
-- [ ] **Undo / Redo** (`Ctrl+Z` / `Ctrl+Y`)
-  - Maintain a command history stack (20 steps)
-  - Each move, resize, add, delete, style-change is one command
-  - Without this, users are afraid to experiment — adoption drops
-
-- [ ] **Keyboard shortcuts**
+- [x] **Keyboard shortcuts** (blocked when an `<input>` / `<textarea>` / `<select>` has focus)
   - `Delete` / `Backspace` → remove selected element
   - `Arrow keys` → nudge selected element by 1 unit
   - `Shift + Arrow` → nudge by 5 units
-  - `Ctrl + D` → duplicate element
+  - `Ctrl + D` → duplicate element (offset by 5 units)
   - `Escape` → deselect
+  - `Ctrl+Z` / `Ctrl+Y` (Ctrl+Shift+Z) → undo / redo
+  - Shortcut hint bar displayed in the canvas toolbar
 
-- [ ] **Label size presets** — "New Label" dialog with common sizes:
-  - 4" × 6" (standard shipping label)
-  - 2" × 1" (small product / jewelry)
-  - 3" × 2" (medium asset tag)
-  - 100mm × 50mm (EU standard)
-  - Custom (manual width/height input)
+- [x] **Label size presets** — "Size Preset" dropdown in Layout Settings:
+  - Badge — 100 × 60 mm
+  - EU Standard — 100 × 50 mm
+  - Mini Tag — 50 × 25 mm
+  - Brother QL — 62 × 29 mm
+  - Shipping Label — 4" × 6"
+  - Asset Tag — 3" × 2"
+  - Small Label — 2" × 1"
+  - Resets to "Custom" after applying; updates width/height/unit inputs
 
-- [ ] **Snap-to-grid** — optional 1mm grid with visual dots, elements snap on drag
+- [x] **Snap-to-grid** — toggle checkbox in canvas toolbar
+  - Snaps drag and resize to 1-unit grid
+  - Visual dot grid overlay on canvas (indigo dots, CSS `::before` pseudo-element)
+  - Grid spacing scales with `pxPerUnit` (responsive to canvas zoom)
 
-- [ ] **Element alignment toolbar** — when an element is selected show:
-  - Align left / center / right (relative to label)
-  - Align top / middle / bottom
-  - This is the single most-requested feature in every label design tool
+- [x] **Element alignment toolbar** — appears in the right sidebar when any element is selected
+  - 6 icon buttons: Align Left, Center-H, Align Right | Align Top, Center-V, Align Bottom
+  - Each action is recorded in the undo stack
 
 ---
 
-### 1.3 — Developer Experience Improvements
+### 1.3 — Developer Experience Improvements 🔲 Pending
 
 - [ ] **`create-qrlayout-app` scaffolder**
   ```bash
   npx create-qrlayout-app my-label-app --framework react
   ```
-  Generates a project with the designer + export buttons pre-wired. Lowest-friction onboarding.
+  Generates a project with the designer + export buttons pre-wired.
 
 - [ ] **Vue and Svelte wrapper packages** (currently only React has one)
   - `vue-qr-label` — Vue 3 Composition API component
@@ -169,26 +198,19 @@ These are the issues that cause users to abandon the designer in the first 5 min
 
 ---
 
-## Phase 2 — Feature Completeness  *(v1.3 — 3 months out)*
+## Phase 2 — Feature Completeness *(v1.3 — 3 months out)* 🔲 Pending
 
 **Goal:** Close the biggest feature gaps that block real-world production use.
 
 ---
 
-### 2.1 — Barcode Element (Highest Priority Feature)
+### 2.1 — Barcode Element *(Highest Priority Feature)*
 
 QR codes are consumer-facing. Barcodes are industrial. Without barcode support, the tool cannot target logistics, retail, or manufacturing seriously.
 
-**Add `type: "barcode"` to `StickerElement`:**
+- [ ] **Add `type: "barcode"` to `StickerElement`**
 
 ```typescript
-// New element type
-interface StickerElement {
-  type: "text" | "qr" | "barcode";  // add "barcode"
-  barcodeFormat?: BarcodeFormat;    // new field
-  // ...existing fields
-}
-
 type BarcodeFormat =
   | "CODE128"   // universal logistics (GS1, shipping)
   | "EAN13"     // retail product labels
@@ -198,196 +220,121 @@ type BarcodeFormat =
   | "DATAMATRIX"; // pharma / small parts
 ```
 
-**Implementation plan:**
-- Canvas render: use `jsbarcode` library (4KB, zero dependencies)
-- PDF export: render barcode to canvas data URL → `doc.addImage()`
-- ZPL export: native ZPL barcode commands (`^BCN` for Code 128, `^BEN` for EAN-13)
-- Designer UI: "Add Barcode" button + format selector in property panel
+- [ ] Canvas render: use `jsbarcode` library (4KB, zero dependencies)
+- [ ] PDF export: render barcode to canvas data URL → `doc.addImage()`
+- [ ] ZPL export: native ZPL barcode commands (`^BCN` for Code 128, `^BEN` for EAN-13)
+- [ ] Designer UI: "Add Barcode" button + format selector in property panel
 
 ---
 
 ### 2.2 — Image / Logo Element
 
-Enables company logos, product photos, and compliance symbols on labels.
-
-**Add `type: "image"` to `StickerElement`:**
-
-```typescript
-interface StickerElement {
-  type: "text" | "qr" | "barcode" | "image";  // add "image"
-  imageSrc?: string;   // static URL or data URL (logo)
-  imageVar?: string;   // dynamic: "{{productPhoto}}" from data
-}
-```
-
-- Canvas: `ctx.drawImage()` — already supported by current rendering pipeline
-- PDF: `doc.addImage()` — already supported
-- ZPL: Convert image to ZPL bitmap using `^GF` (Graphic Field) command
-- Designer UI: Upload button or paste URL in property panel
+- [ ] **Add `type: "image"` to `StickerElement`**
+  - Static URL or data URL (logo)
+  - Dynamic: `{{productPhoto}}` from data
+- [ ] Canvas: `ctx.drawImage()` — already supported by current pipeline
+- [ ] PDF: `doc.addImage()` — already supported
+- [ ] ZPL: Convert image to ZPL bitmap using `^GF` (Graphic Field) command
+- [ ] Designer UI: Upload button or paste URL in property panel
 
 ---
 
 ### 2.3 — Shape / Border Elements
 
-Labels without borders look unfinished. This is a small effort with big visual impact.
-
-**Add `type: "rect"` and `type: "line"` to `StickerElement`:**
-
-- Canvas: `ctx.strokeRect()`, `ctx.beginPath()`, `ctx.lineTo()`
-- PDF: `doc.rect()`, `doc.line()`
-- ZPL: `^GB` (Graphic Box) command — already a native ZPL command
+- [ ] **Add `type: "rect"` and `type: "line"` to `StickerElement`**
+- [ ] Canvas: `ctx.strokeRect()`, `ctx.beginPath()`, `ctx.lineTo()`
+- [ ] PDF: `doc.rect()`, `doc.line()`
+- [ ] ZPL: `^GB` (Graphic Box) — native ZPL command
 
 ---
 
 ### 2.4 — CSV / Excel Data Import
 
-Currently users must write code to pass data arrays. This Phase adds file-based data input directly in the designer preview and in a new batch-export panel.
+- [ ] **CSV import:** use `papaparse` (5KB, zero deps)
+- [ ] **Excel import:** use `xlsx` (SheetJS)
+- [ ] **UI flow:** upload → preview 5 rows → map columns to `{{variables}}` → export all
 
-- **CSV import:** use `papaparse` (5KB, zero deps) — parse `.csv` → array of records
-- **Excel import:** use `xlsx` (SheetJS) — parse `.xlsx` / `.xls` → array of records
-- **UI flow:**
-  1. Upload file button in export panel
-  2. Preview first 5 rows in a table
-  3. Map column names to `{{variable}}` fields (auto-match by name)
-  4. Click "Export All" → batch PDF / PNG / ZPL
-
-This is the **exact same workflow the desktop app will use** — implementing it here first means the core is already built when you start the desktop repo.
+> This is the same workflow the desktop app will use — implementing it here first means the core is already built when you start the desktop repo.
 
 ---
 
 ### 2.5 — ZPL Live Preview Panel
 
-The current workflow requires users to send ZPL to a physical printer to verify output. This adds instant browser-side preview using the free Labelary API.
-
-- Add a "Printer View" toggle in the designer
-- When toggled, send current ZPL string to `api.labelary.com` and display the returned PNG
-- This closes the "what will it actually look like on the printer?" anxiety
-- Falls back to canvas preview when offline or API is unavailable
+- [ ] Add "Printer View" toggle in the designer
+- [ ] Send current ZPL string to Labelary API and display the returned PNG
+- [ ] Fallback to canvas preview when offline or API unavailable
 
 ---
 
 ### 2.6 — Multi-label Per Page (Sheet Layout)
 
-For Avery-style label sheets (e.g., 3-across × 10-down = 30 labels per page).
-
-```typescript
-interface SheetLayout {
-  pageWidth: number;
-  pageHeight: number;
-  unit: Unit;
-  columns: number;
-  rows: number;
-  marginTop: number;
-  marginLeft: number;
-  gapH: number;
-  gapV: number;
-  labelLayout: StickerLayout;  // the per-label template
-}
-```
-
-- PDF export: renders labels in a grid, packs multiple records per page
-- PNG export: renders the entire sheet as one image
-- Common presets: Avery 5160 (3×10), Avery 5163 (2×5), custom
+- [ ] **New `SheetLayout` type:** rows × columns, margin, gap
+- [ ] PDF export: renders labels in a grid (Avery 5160 = 3×10)
+- [ ] PNG export: renders the entire sheet as one image
+- [ ] Common presets: Avery 5160, Avery 5163, custom
 
 ---
 
-## Phase 3 — Desktop Application  *(Separate Repo — 6+ months)*
+## Phase 3 — Desktop Application *(Separate Repo — 6+ months)* 🔲 Pending
 
 **Goal:** A standalone cross-platform desktop app built on top of the npm packages from this repo.
 
-> This is a new repository. The packages in this repo (`qrlayout-core`, `qrlayout-ui`) become the npm dependencies of the desktop app — they are not duplicated.
+> This is a **new repository**. The packages in this repo (`qrlayout-core`, `qrlayout-ui`) become npm dependencies of the desktop app — they are not duplicated.
 
 ---
 
-### 3.1 — Technology Stack Decision
+### 3.1 — Technology Stack
+
+**Recommended: Tauri + React**
 
 | Option | Pros | Cons |
 |--------|------|------|
-| **Electron + React** | Full web tech, easy to reuse existing UI package | Large bundle size (~150MB) |
-| **Tauri + React** | Tiny bundle (~10MB), Rust backend is fast | Rust learning curve for contributors |
-| **Tauri** (Recommended) | Best performance, best file system access for Excel/CSV, smallest download | — |
-
-**Recommended:** Tauri for the desktop shell + React UI that reuses `qrlayout-ui` and `qrlayout-core` directly.
+| **Tauri + React** | Tiny bundle (~10MB), fast Rust backend, best file system access | Rust required for native features |
+| Electron + React | Full web tech, easy reuse | Large bundle (~150MB) |
 
 ---
 
 ### 3.2 — Desktop App Core Features
 
-#### Excel / CSV Data Source
-```
-User action:                  App does:
-─────────────────────         ─────────────────────────────────
-Open .xlsx file       →       Parse all sheets, show sheet picker
-Select a sheet        →       Display rows in a spreadsheet-like table
-                              Column headers become available {{fields}}
-```
+- [ ] **Excel / CSV Data Source**
+  - File open dialog (native OS via Tauri)
+  - Parse `.xlsx` with SheetJS, `.csv` with PapaParse
+  - Show data in sortable, filterable table
+  - Column headers auto-map to `{{variableName}}` in the designer
 
-- File open dialog (native OS dialog via Tauri)
-- Parse `.xlsx` with SheetJS, `.csv` with PapaParse (same libraries as Phase 2.4)
-- Show data in a sortable, filterable table
-- Column header names auto-map to `{{variableName}}` in the designer
+- [ ] **Layout Designer (Embedded)**
+  - Embed `qrlayout-ui` inside the Tauri window
+  - Column names from Excel passed as `EntitySchema.fields`
+  - Save layouts to local app data folder (JSON files)
+  - Built-in template library (10–15 starter templates)
 
-#### Layout Designer (Embedded)
-- Embed `qrlayout-ui` (the same npm package) inside the Electron/Tauri window
-- Column names from the Excel file are passed as `EntitySchema.fields` — they appear as click-to-insert pills in the designer
-- Save layouts to local app data folder (JSON files)
-- Templates library: ship 10–15 built-in templates the user can start from
+- [ ] **Local Layout Library**
+  - Layouts stored as JSON in user's local app data directory
+  - Import/export layout JSON files for sharing between users
 
-#### Local Layout Library
-```
-Saved Layouts
-├── Employee Badge (100×60mm)       last used: 2 days ago
-├── Shipping Label (4"×6")          last used: today
-├── Asset Tag (50×25mm)             last used: 1 week ago
-└── [+ New Layout]
-```
+- [ ] **Print Panel**
+  - Select layout + loaded data
+  - Filter/sort rows before printing
+  - Export: PDF, PNG batch, ZPL file, or direct printer send
 
-- Layouts stored as JSON in the user's local app data directory
-- Can import/export layout JSON files for sharing between users
-
-#### Print Panel
-```
-┌─────────────────────────────────────────────────────┐
-│  Layout:  [Employee Badge ▼]                        │
-│  Data:    [employees.xlsx — 47 rows]                │
-│                                                     │
-│  ┌──────────────────┐  Filter rows by:              │
-│  │  Preview         │  Department: [All ▼]          │
-│  │  [Label render]  │  Status: [Active ▼]           │
-│  └──────────────────┘                               │
-│                                                     │
-│  Export: [PDF ▼]  [Print (ZPL) ▼]  [PNG Batch]     │
-└─────────────────────────────────────────────────────┘
-```
-
-- Select layout from local library
-- Data already loaded from Excel file
-- Filter/sort rows before printing
-- Print actions:
-  - **ZPL:** Send directly to network printer (IP:Port) or save as `.zpl` file
-  - **PDF:** Save multi-page PDF, or send to system print dialog
-  - **PNG:** Export one PNG per row into a folder
-
-#### Direct Printer Connection (Desktop Only)
-- Connect to Zebra thermal printer by IP address or USB
-- Send ZPL directly from app — no file download step
-- Test connection with a test label
-- This is the feature that makes the desktop app worth having over the web version
+- [ ] **Direct Printer Connection** *(desktop-only feature)*
+  - Connect to Zebra thermal printer by IP address or USB
+  - Send ZPL directly from the app — no file download step
+  - Test connection with a test label
 
 ---
 
-### 3.3 — Desktop App — Extra Features (Nice to Have)
+### 3.3 — Desktop App Nice-to-Have
 
-- [ ] **Print history** — log of every print job (layout used, record count, timestamp)
-- [ ] **Template sharing** — export/import layout JSON; share via email or file
-- [ ] **Auto-update** — Tauri's built-in updater, checks for new versions on launch
-- [ ] **Offline-first** — everything works without internet (no cloud dependency)
-- [ ] **Keyboard-driven workflow** — open file → design → print without touching the mouse
-- [ ] **Multiple Excel files open** — tab-based data source switcher
+- [ ] Print history — log of every print job (layout, record count, timestamp)
+- [ ] Template sharing — export/import layout JSON via email or file
+- [ ] Auto-update — Tauri's built-in updater
+- [ ] Offline-first — everything works without internet
+- [ ] Multiple Excel files open — tab-based data source switcher
 
 ---
 
-## Phase 4 — Ecosystem & Community  *(Ongoing)*
+## Phase 4 — Ecosystem & Community *(Ongoing)* 🔲 Pending
 
 **Goal:** Make this the default answer when a developer Googles "how to print labels from a web app."
 
@@ -395,60 +342,42 @@ Saved Layouts
 
 ### 4.1 — Documentation Site
 
-- Build a `docs.qrlayout.dev` site using VitePress (free Netlify hosting)
-- Key pages:
-  - "How to print labels from React" — targets the most-searched phrase
-  - "Generate ZPL from JavaScript" — currently uncontested keyword
-  - API reference (auto-generated from TSDoc)
-  - Template gallery
-  - Migration guide: "Moving from Bartender / NiceLabel"
+- [ ] Build `docs.qrlayout.dev` using VitePress (free Netlify hosting)
+- [ ] Key pages: "How to print labels from React", "Generate ZPL from JavaScript", API reference, Template gallery, Migration guide from Bartender / NiceLabel
 
 ### 4.2 — Template Gallery
 
-- 20+ curated label templates in the repo (`/templates/` folder)
-- Each template is a `StickerLayout` JSON + a screenshot
-- Community can submit templates via Pull Request
-- Desktop app ships these built-in; web designer loads them from GitHub raw URLs
+- [ ] 20+ curated label templates in `/templates/` folder (JSON + screenshot)
+- [ ] Community can submit templates via Pull Request
+- [ ] Desktop app ships these built-in
 
 ### 4.3 — CLI Tool (`qrlayout-cli`)
 
-```bash
-# Install once
-npm install -g qrlayout-cli
-
-# Generate labels from command line
-qrlayout generate \
-  --layout ./badge-template.json \
-  --data   ./employees.csv \
-  --format zpl \
-  --out    ./output/
-
-# Outputs: ./output/EMP-001.zpl, ./output/EMP-002.zpl, ...
-```
-
-- Enables CI/CD label pipelines (trigger prints from GitHub Actions, ERP webhooks)
-- Same core engine — just a new CLI entry point over `qrlayout-core`
+- [ ] `npx qrlayout generate --layout label.json --data records.csv --format zpl --out ./output/`
+- [ ] Enables CI/CD label pipelines and ERP webhook triggers
 
 ### 4.4 — Framework Wrappers (Publish All)
 
-| Package | Status | Action |
-|---------|--------|--------|
-| `react-qr-label` | Published ✓ | Maintain |
-| `vue-qr-label` | Demo only | Publish as proper package |
-| `svelte-qr-label` | Demo only | Publish as proper package |
-| `angular-qr-label` | Demo only | Publish as proper package |
-| `qrlayout-cli` | Missing | Create (Phase 4.3) |
+| Package | Status |
+|---------|--------|
+| `react-qr-label` | ✅ Published |
+| `vue-qr-label` | 🔲 Demo only — publish as package (Phase 1.3) |
+| `svelte-qr-label` | 🔲 Demo only — publish as package (Phase 1.3) |
+| `angular-qr-label` | 🔲 Demo only — publish as package |
+| `qrlayout-cli` | 🔲 Missing — create in Phase 4.3 |
 
 ---
 
-## Roadmap Summary Table
+## Roadmap Summary
 
-| Phase | What | When | Key Outcome |
-|-------|------|------|-------------|
-| **1** | Tests, undo/redo, keyboard shortcuts, label presets, TSDoc | Now — 3 months | Stable, trustworthy library |
-| **2** | Barcode element, image element, shapes, CSV/Excel import, ZPL preview, sheet layout | 3–6 months | Production-ready for logistics/retail/HR |
-| **3** | Desktop app (Tauri) — Excel data source, local layout library, direct ZPL print | 6–12 months | Standalone tool for non-developers |
-| **4** | Docs site, template gallery, CLI, all framework wrappers published | Ongoing | Community and ecosystem |
+| Phase | What | Status | Key Outcome |
+|-------|------|--------|-------------|
+| **1.1** | Tests, utils refactor, TSDoc, CI, CHANGELOG, fontSize fix | ✅ Done | Stable, trustworthy library |
+| **1.2** | Undo/redo, keyboard shortcuts, label presets, snap-to-grid, alignment | 🔲 Next | Designer users can work confidently |
+| **1.3** | CONTRIBUTING.md, scaffolder, Vue/Svelte wrappers | 🔲 Next | Lower onboarding friction |
+| **2** | Barcode, image element, shapes, CSV/Excel import, ZPL preview, sheet layout | 🔲 Planned | Production-ready for logistics/retail/HR |
+| **3** | Desktop app (Tauri) — Excel source, local layouts, direct ZPL print | 🔲 Planned | Standalone tool for non-developers |
+| **4** | Docs site, template gallery, CLI, all framework wrappers | 🔲 Ongoing | Community and ecosystem |
 
 ---
 
@@ -456,7 +385,7 @@ qrlayout generate \
 
 **Add barcode support (`CODE128` first).**
 
-A label tool that only outputs QR codes cannot target warehousing, logistics, or retail — all of which require linear barcodes. Adding `CODE128` alone would double the addressable use cases with about a week of implementation work. Every other improvement is additive; this one is multiplicative.
+Every warehouse, ERP, retail POS, and logistics system expects linear barcodes. Adding `CODE128` alone would double the addressable use cases with about a week of implementation work. Every other improvement is additive; this one is multiplicative.
 
 ---
 
