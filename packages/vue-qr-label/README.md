@@ -1,16 +1,16 @@
-# react-qr-label
+# vue-qr-label
 
-**The official React component for the QR Layout Designer — drag-and-drop label design with PDF, PNG, and ZPL export.**
+**The official Vue 3 component for the QR Layout Designer — drag-and-drop label design with PDF, PNG, and ZPL export.**
 
-[![npm version](https://img.shields.io/npm/v/react-qr-label.svg)](https://www.npmjs.com/package/react-qr-label)
-[![npm downloads](https://img.shields.io/npm/dm/react-qr-label.svg)](https://www.npmjs.com/package/react-qr-label)
+[![npm version](https://img.shields.io/npm/v/vue-qr-label.svg)](https://www.npmjs.com/package/vue-qr-label)
+[![npm downloads](https://img.shields.io/npm/dm/vue-qr-label.svg)](https://www.npmjs.com/package/vue-qr-label)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
 [![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-layout-generate-tool?style=social)](https://github.com/shashi089/qr-code-layout-generate-tool/stargazers)
 
-Drop a fully featured label designer into your React app with a single component. Users can drag and drop elements, bind `{{variables}}` from your data schema, preview in real-time, and export to PDF, PNG, or ZPL for Zebra thermal printers.
+Drop a fully featured label designer into your Vue 3 app with a single component. Users can drag and drop elements, bind `{{variables}}` from your data schema, preview in real-time, and export to PDF, PNG, or ZPL for Zebra thermal printers.
 
-Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool) monorepo — also available for [Vue 3](../vue-qr-label), [Svelte 5](../svelte-qr-label), and [vanilla JS](../ui).
+Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool) monorepo — also available for [React](../react-qr-label), [Svelte 5](../svelte-qr-label), and [vanilla JS](../ui).
 
 ---
 
@@ -18,7 +18,7 @@ Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generat
 
 Try the designer — no signup needed:
 
-[▶ Open React Demo](https://qr-layout-designer.netlify.app/) &nbsp;|&nbsp; [Source Code](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo)
+[▶ Open Vue Demo](https://qr-layout-designer-vue.netlify.app/) &nbsp;|&nbsp; [Source Code](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/vue-demo)
 
 ![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-layout-generate-tool/raw/main/assets/layout_designer.png)
 
@@ -30,7 +30,7 @@ Try the designer — no signup needed:
 - **Live Preview** — see your label render with real sample data as you design
 - **`{{variable}}` Data Binding** — bind fields like `{{name}}`, `{{id}}`, `{{department}}` from your entity schema
 - **Multi-Variable QR** — join multiple fields into one QR scan with a configurable separator
-- **Rich Text Styling** — font size, weight, alignment; color, font family, word wrap, and line height available via JSON
+- **Rich Text Styling** — font size, weight, alignment; color, font family, word wrap, and line height
 - **Label Size Presets** — common shipping, badge, and tag sizes built in
 - **Snap-to-Grid** — optional 1-unit grid snapping while dragging
 - **Alignment Toolbar** — align selected elements to the label edges or center
@@ -45,27 +45,30 @@ Try the designer — no signup needed:
 ## 📦 Installation
 
 ```bash
-npm install react-qr-label
+npm install vue-qr-label
 ```
 
 `qrlayout-core` and `qrlayout-ui` are included as direct dependencies — no extra installs needed.
+
+**Requirements:** Vue 3.0+ as a peer dependency (already installed in any Vue 3 app).
 
 ---
 
 ## 🚀 Quick Start
 
-```tsx
-import { QRLabelDesigner } from 'react-qr-label';
-import 'react-qr-label/style.css';
-import type { StickerLayout, EntitySchema } from 'react-qr-label';
+```vue
+<script setup lang="ts">
+import { QRLabelDesigner } from 'vue-qr-label';
+import 'vue-qr-label/style.css';
+import type { StickerLayout, EntitySchema } from 'vue-qr-label';
 
-const SCHEMAS: Record<string, EntitySchema> = {
+const schemas: Record<string, EntitySchema> = {
   employee: {
     label: 'Employee',
     fields: [
-      { name: 'fullName',    label: 'Full Name'    },
-      { name: 'employeeId',  label: 'Employee ID'  },
-      { name: 'department',  label: 'Department'   },
+      { name: 'fullName',   label: 'Full Name'   },
+      { name: 'employeeId', label: 'Employee ID' },
+      { name: 'department', label: 'Department'  },
     ],
     sampleData: {
       fullName: 'Alice Johnson',
@@ -75,42 +78,81 @@ const SCHEMAS: Record<string, EntitySchema> = {
   },
 };
 
-export default function LabelsPage() {
-  return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <QRLabelDesigner
-        entitySchemas={SCHEMAS}
-        onSave={(layout) => {
-          // layout is a plain JSON object — save to your backend or localStorage
-          console.log('Saved:', layout);
-        }}
-      />
-    </div>
-  );
+function handleSave(layout: StickerLayout) {
+  // layout is a plain JSON object — save to your backend or localStorage
+  console.log('Saved:', layout);
 }
+</script>
+
+<template>
+  <div style="width: 100vw; height: 100vh;">
+    <QRLabelDesigner
+      :entity-schemas="schemas"
+      @save="handleSave"
+    />
+  </div>
+</template>
+```
+
+### Loading an existing layout
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import { QRLabelDesigner } from 'vue-qr-label';
+import 'vue-qr-label/style.css';
+import type { StickerLayout } from 'vue-qr-label';
+
+// Load from your API or localStorage
+const savedLayout = ref<StickerLayout>(
+  JSON.parse(localStorage.getItem('myLayout') ?? 'null')
+);
+
+function handleSave(layout: StickerLayout) {
+  localStorage.setItem('myLayout', JSON.stringify(layout));
+  savedLayout.value = layout;
+}
+</script>
+
+<template>
+  <QRLabelDesigner
+    :initial-layout="savedLayout"
+    :entity-schemas="schemas"
+    @save="handleSave"
+  />
+</template>
 ```
 
 ---
 
-## ⚙️ Props
+## ⚙️ Props & Events
+
+### Props
 
 | Prop | Type | Required | Description |
 | :--- | :--- | :---: | :--- |
-| `initialLayout` | `StickerLayout` | ❌ | Layout to pre-load on mount |
-| `entitySchemas` | `Record<string, EntitySchema>` | ❌ | Field definitions for `{{variable}}` binding and live preview |
-| `onSave` | `(layout: StickerLayout) => void` | ❌ | Called when the user clicks "Save Layout" |
-| `className` | `string` | ❌ | CSS class for the container `<div>` |
-| `style` | `React.CSSProperties` | ❌ | Inline styles for the container `<div>` |
+| `initialLayout` | `StickerLayout` | ❌ | Layout to pre-load on mount. The designer re-creates itself when this changes. |
+| `entitySchemas` | `Record<string, EntitySchema>` | ❌ | Field definitions for `{{variable}}` binding and live preview. The designer re-creates itself when this changes. |
+
+### Events
+
+| Event | Payload | Description |
+| :--- | :--- | :--- |
+| `save` | `StickerLayout` | Emitted when the user clicks "Save Layout" |
+
+```vue
+<QRLabelDesigner @save="(layout) => console.log(layout)" />
+```
 
 ---
 
 ## 💾 Save & Print Workflow
 
-The designer produces a plain JSON layout object. Pass it with real data to `StickerPrinter` (from `react-qr-label`) to generate PDF, PNG, or ZPL output.
+The designer produces a plain JSON layout object. Pass it with real data to `StickerPrinter` (re-exported from `vue-qr-label`) to generate PDF, PNG, or ZPL output.
 
 ```
   User designs in <QRLabelDesigner />
-          │ onSave(layoutJSON)
+          │ @save="handleSave(layout)"
           ▼
   Save layoutJSON to your DB / localStorage
           │ load layoutJSON + real records
@@ -123,7 +165,7 @@ The designer produces a plain JSON layout object. Pass it with real data to `Sti
 > Requires `jspdf`: `npm install jspdf`
 
 ```typescript
-import { StickerPrinter } from 'react-qr-label';
+import { StickerPrinter } from 'vue-qr-label';
 
 const printer = new StickerPrinter();
 const pdf = await printer.exportToPDF(layoutJSON, records);
@@ -133,7 +175,7 @@ pdf.save('badges.pdf');
 ### Export to ZPL (Zebra thermal printers)
 
 ```typescript
-import { StickerPrinter } from 'react-qr-label';
+import { StickerPrinter } from 'vue-qr-label';
 
 const printer = new StickerPrinter();
 
@@ -146,6 +188,8 @@ const zplPages = printer.exportToZPL(layoutJSON, records, { dpi: 203 });
 ### Export to PNG
 
 ```typescript
+import { StickerPrinter } from 'vue-qr-label';
+
 const printer = new StickerPrinter();
 
 for (const record of records) {
@@ -229,7 +273,7 @@ interface EntityField {
 | :--- | :--- |
 | [`qrlayout-core`](https://www.npmjs.com/package/qrlayout-core) | Headless engine — render PNG, PDF, ZPL without the UI |
 | [`qrlayout-ui`](https://www.npmjs.com/package/qrlayout-ui) | Framework-agnostic designer (vanilla TS) |
-| [`vue-qr-label`](https://www.npmjs.com/package/vue-qr-label) | Vue 3 wrapper |
+| [`react-qr-label`](https://www.npmjs.com/package/react-qr-label) | React wrapper |
 | [`svelte-qr-label`](https://www.npmjs.com/package/svelte-qr-label) | Svelte 5 wrapper |
 
 ---

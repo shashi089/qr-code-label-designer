@@ -1,16 +1,16 @@
-# react-qr-label
+# svelte-qr-label
 
-**The official React component for the QR Layout Designer — drag-and-drop label design with PDF, PNG, and ZPL export.**
+**The official Svelte 5 component for the QR Layout Designer — drag-and-drop label design with PDF, PNG, and ZPL export.**
 
-[![npm version](https://img.shields.io/npm/v/react-qr-label.svg)](https://www.npmjs.com/package/react-qr-label)
-[![npm downloads](https://img.shields.io/npm/dm/react-qr-label.svg)](https://www.npmjs.com/package/react-qr-label)
+[![npm version](https://img.shields.io/npm/v/svelte-qr-label.svg)](https://www.npmjs.com/package/svelte-qr-label)
+[![npm downloads](https://img.shields.io/npm/dm/svelte-qr-label.svg)](https://www.npmjs.com/package/svelte-qr-label)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
 [![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-layout-generate-tool?style=social)](https://github.com/shashi089/qr-code-layout-generate-tool/stargazers)
 
-Drop a fully featured label designer into your React app with a single component. Users can drag and drop elements, bind `{{variables}}` from your data schema, preview in real-time, and export to PDF, PNG, or ZPL for Zebra thermal printers.
+Drop a fully featured label designer into your Svelte 5 app with a single component. Users can drag and drop elements, bind `{{variables}}` from your data schema, preview in real-time, and export to PDF, PNG, or ZPL for Zebra thermal printers.
 
-Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool) monorepo — also available for [Vue 3](../vue-qr-label), [Svelte 5](../svelte-qr-label), and [vanilla JS](../ui).
+Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool) monorepo — also available for [React](../react-qr-label), [Vue 3](../vue-qr-label), and [vanilla JS](../ui).
 
 ---
 
@@ -18,7 +18,9 @@ Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generat
 
 Try the designer — no signup needed:
 
-[▶ Open React Demo](https://qr-layout-designer.netlify.app/) &nbsp;|&nbsp; [Source Code](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo)
+| Framework | Live Demo | Source Code |
+| :--- | :--- | :--- |
+| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
 
 ![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-layout-generate-tool/raw/main/assets/layout_designer.png)
 
@@ -30,7 +32,7 @@ Try the designer — no signup needed:
 - **Live Preview** — see your label render with real sample data as you design
 - **`{{variable}}` Data Binding** — bind fields like `{{name}}`, `{{id}}`, `{{department}}` from your entity schema
 - **Multi-Variable QR** — join multiple fields into one QR scan with a configurable separator
-- **Rich Text Styling** — font size, weight, alignment; color, font family, word wrap, and line height available via JSON
+- **Rich Text Styling** — font size, weight, alignment; color, font family, word wrap, and line height
 - **Label Size Presets** — common shipping, badge, and tag sizes built in
 - **Snap-to-Grid** — optional 1-unit grid snapping while dragging
 - **Alignment Toolbar** — align selected elements to the label edges or center
@@ -45,49 +47,77 @@ Try the designer — no signup needed:
 ## 📦 Installation
 
 ```bash
-npm install react-qr-label
+npm install svelte-qr-label
 ```
 
 `qrlayout-core` and `qrlayout-ui` are included as direct dependencies — no extra installs needed.
+
+**Requirements:** Svelte 5.0+ as a peer dependency (already installed in any Svelte 5 app).
 
 ---
 
 ## 🚀 Quick Start
 
-```tsx
-import { QRLabelDesigner } from 'react-qr-label';
-import 'react-qr-label/style.css';
-import type { StickerLayout, EntitySchema } from 'react-qr-label';
+```svelte
+<script lang="ts">
+  import QRLabelDesigner from 'svelte-qr-label';
+  import 'svelte-qr-label/style.css';
+  import type { StickerLayout, EntitySchema } from 'svelte-qr-label';
 
-const SCHEMAS: Record<string, EntitySchema> = {
-  employee: {
-    label: 'Employee',
-    fields: [
-      { name: 'fullName',    label: 'Full Name'    },
-      { name: 'employeeId',  label: 'Employee ID'  },
-      { name: 'department',  label: 'Department'   },
-    ],
-    sampleData: {
-      fullName: 'Alice Johnson',
-      employeeId: 'EMP-001',
-      department: 'Engineering',
+  const schemas: Record<string, EntitySchema> = {
+    employee: {
+      label: 'Employee',
+      fields: [
+        { name: 'fullName',   label: 'Full Name'   },
+        { name: 'employeeId', label: 'Employee ID' },
+        { name: 'department', label: 'Department'  },
+      ],
+      sampleData: {
+        fullName: 'Alice Johnson',
+        employeeId: 'EMP-001',
+        department: 'Engineering',
+      },
     },
-  },
-};
+  };
 
-export default function LabelsPage() {
-  return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <QRLabelDesigner
-        entitySchemas={SCHEMAS}
-        onSave={(layout) => {
-          // layout is a plain JSON object — save to your backend or localStorage
-          console.log('Saved:', layout);
-        }}
-      />
-    </div>
+  function handleSave(layout: StickerLayout) {
+    // layout is a plain JSON object — save to your backend or localStorage
+    console.log('Saved:', layout);
+  }
+</script>
+
+<div style="width: 100vw; height: 100vh;">
+  <QRLabelDesigner
+    entitySchemas={schemas}
+    onsave={handleSave}
+  />
+</div>
+```
+
+### Loading an existing layout
+
+```svelte
+<script lang="ts">
+  import { QRLabelDesigner } from 'svelte-qr-label';
+  import 'svelte-qr-label/style.css';
+  import type { StickerLayout } from 'svelte-qr-label';
+
+  // Load from your API or localStorage
+  let savedLayout = $state<StickerLayout | undefined>(
+    JSON.parse(localStorage.getItem('myLayout') ?? 'null') ?? undefined
   );
-}
+
+  function handleSave(layout: StickerLayout) {
+    localStorage.setItem('myLayout', JSON.stringify(layout));
+    savedLayout = layout;
+  }
+</script>
+
+<QRLabelDesigner
+  initialLayout={savedLayout}
+  entitySchemas={schemas}
+  onsave={handleSave}
+/>
 ```
 
 ---
@@ -96,21 +126,21 @@ export default function LabelsPage() {
 
 | Prop | Type | Required | Description |
 | :--- | :--- | :---: | :--- |
-| `initialLayout` | `StickerLayout` | ❌ | Layout to pre-load on mount |
-| `entitySchemas` | `Record<string, EntitySchema>` | ❌ | Field definitions for `{{variable}}` binding and live preview |
-| `onSave` | `(layout: StickerLayout) => void` | ❌ | Called when the user clicks "Save Layout" |
-| `className` | `string` | ❌ | CSS class for the container `<div>` |
-| `style` | `React.CSSProperties` | ❌ | Inline styles for the container `<div>` |
+| `initialLayout` | `StickerLayout` | ❌ | Layout to pre-load on mount. The designer re-creates itself when this changes. |
+| `entitySchemas` | `Record<string, EntitySchema>` | ❌ | Field definitions for `{{variable}}` binding and live preview. The designer re-creates itself when this changes. |
+| `onsave` | `(layout: StickerLayout) => void` | ❌ | Called when the user clicks "Save Layout". Uses Svelte 5's lowercase event convention. |
+
+> **Svelte 5 note:** `onsave` follows Svelte 5's lowercase prop convention for event handlers. It updates reactively without re-creating the designer canvas.
 
 ---
 
 ## 💾 Save & Print Workflow
 
-The designer produces a plain JSON layout object. Pass it with real data to `StickerPrinter` (from `react-qr-label`) to generate PDF, PNG, or ZPL output.
+The designer produces a plain JSON layout object. Pass it with real data to `StickerPrinter` (re-exported from `svelte-qr-label`) to generate PDF, PNG, or ZPL output.
 
 ```
   User designs in <QRLabelDesigner />
-          │ onSave(layoutJSON)
+          │ onsave={handleSave}
           ▼
   Save layoutJSON to your DB / localStorage
           │ load layoutJSON + real records
@@ -123,7 +153,7 @@ The designer produces a plain JSON layout object. Pass it with real data to `Sti
 > Requires `jspdf`: `npm install jspdf`
 
 ```typescript
-import { StickerPrinter } from 'react-qr-label';
+import { StickerPrinter } from 'svelte-qr-label';
 
 const printer = new StickerPrinter();
 const pdf = await printer.exportToPDF(layoutJSON, records);
@@ -133,7 +163,7 @@ pdf.save('badges.pdf');
 ### Export to ZPL (Zebra thermal printers)
 
 ```typescript
-import { StickerPrinter } from 'react-qr-label';
+import { StickerPrinter } from 'svelte-qr-label';
 
 const printer = new StickerPrinter();
 
@@ -146,6 +176,8 @@ const zplPages = printer.exportToZPL(layoutJSON, records, { dpi: 203 });
 ### Export to PNG
 
 ```typescript
+import { StickerPrinter } from 'svelte-qr-label';
+
 const printer = new StickerPrinter();
 
 for (const record of records) {
@@ -229,8 +261,8 @@ interface EntityField {
 | :--- | :--- |
 | [`qrlayout-core`](https://www.npmjs.com/package/qrlayout-core) | Headless engine — render PNG, PDF, ZPL without the UI |
 | [`qrlayout-ui`](https://www.npmjs.com/package/qrlayout-ui) | Framework-agnostic designer (vanilla TS) |
+| [`react-qr-label`](https://www.npmjs.com/package/react-qr-label) | React wrapper |
 | [`vue-qr-label`](https://www.npmjs.com/package/vue-qr-label) | Vue 3 wrapper |
-| [`svelte-qr-label`](https://www.npmjs.com/package/svelte-qr-label) | Svelte 5 wrapper |
 
 ---
 

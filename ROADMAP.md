@@ -10,7 +10,7 @@
 |-------|-------|--------|
 | **1.1** | Core Engine Hardening | ✅ Complete |
 | **1.2** | Designer UX — Must-Fix Issues | ✅ Complete |
-| **1.3** | Developer Experience Improvements | 🔲 Pending |
+| **1.3** | Developer Experience Improvements | ✅ Complete |
 | **2** | Feature Completeness | 🔲 Pending |
 | **3** | Desktop Application | 🔲 Pending |
 | **4** | Ecosystem & Community | 🔲 Pending |
@@ -93,9 +93,12 @@ qr-code-layout-generate-tool/ (this repo)
 ├── packages/
 │   ├── qrlayout-core      → headless engine (render, PDF, ZPL, PNG)
 │   ├── qrlayout-ui        → visual drag-and-drop designer (vanilla TS)
-│   └── react-qr-label     → React wrapper component
+│   ├── react-qr-label     → React wrapper component
+│   ├── vue-qr-label       → Vue 3 wrapper component
+│   └── svelte-qr-label    → Svelte 5 wrapper component
 └── examples/
     ├── react-demo
+    ├── react-qr-label-demo
     ├── angular-demo
     ├── vue-demo
     ├── svelte-demo
@@ -181,20 +184,26 @@ qr-code-layout-generate-tool/ (this repo)
 
 ---
 
-### 1.3 — Developer Experience Improvements 🔲 Pending
+### 1.3 — Developer Experience Improvements ✅ Complete
 
-- [ ] **`create-qrlayout-app` scaffolder**
-  ```bash
-  npx create-qrlayout-app my-label-app --framework react
-  ```
-  Generates a project with the designer + export buttons pre-wired.
+- [x] **`vue-qr-label`** — Vue 3 Composition API wrapper (`packages/vue-qr-label`)
+  - `<QRLabelDesigner :initial-layout="layout" :entity-schemas="schemas" @save="onSave" />`
+  - Destroys and re-creates the designer when `initialLayout` or `entitySchemas` change
+  - Updates `onSave` callback without re-creating (avoids canvas flicker)
+  - Builds with Vite + `@vitejs/plugin-vue` + `vite-plugin-dts`
+  - Re-exports `StickerPrinter`, `StickerLayout`, `StickerElement`, `EntitySchema`
 
-- [ ] **Vue and Svelte wrapper packages** (currently only React has one)
-  - `vue-qr-label` — Vue 3 Composition API component
-  - `svelte-qr-label` — Svelte 5 rune-based component
-  - Convert the existing demo apps into proper published packages
+- [x] **`svelte-qr-label`** — Svelte 5 rune-based wrapper (`packages/svelte-qr-label`)
+  - `<QRLabelDesigner {entitySchemas} onsave={handleSave} />`
+  - Uses `$effect` for reactive re-mounting on prop changes; cleanup returned from `$effect` handles unmount
+  - Builds with Vite + `@sveltejs/vite-plugin-svelte` + `vite-plugin-dts`
+  - Re-exports same types as the Vue wrapper
 
-- [ ] **`CONTRIBUTING.md`** — local setup steps, PR checklist, coding conventions
+- [x] **`CONTRIBUTING.md`** — at repo root
+  - Local setup commands
+  - Which package to edit for each change type
+  - PR checklist (tests, TypeScript, CHANGELOG, scope)
+  - Coding conventions (fontSize in pt, undo-safe mutations, no re-implementing utils)
 
 ---
 
@@ -361,8 +370,8 @@ type BarcodeFormat =
 | Package | Status |
 |---------|--------|
 | `react-qr-label` | ✅ Published |
-| `vue-qr-label` | 🔲 Demo only — publish as package (Phase 1.3) |
-| `svelte-qr-label` | 🔲 Demo only — publish as package (Phase 1.3) |
+| `vue-qr-label` | ✅ Package created (Phase 1.3) — publish when ready |
+| `svelte-qr-label` | ✅ Package created (Phase 1.3) — publish when ready |
 | `angular-qr-label` | 🔲 Demo only — publish as package |
 | `qrlayout-cli` | 🔲 Missing — create in Phase 4.3 |
 
@@ -373,8 +382,8 @@ type BarcodeFormat =
 | Phase | What | Status | Key Outcome |
 |-------|------|--------|-------------|
 | **1.1** | Tests, utils refactor, TSDoc, CI, CHANGELOG, fontSize fix | ✅ Done | Stable, trustworthy library |
-| **1.2** | Undo/redo, keyboard shortcuts, label presets, snap-to-grid, alignment | 🔲 Next | Designer users can work confidently |
-| **1.3** | CONTRIBUTING.md, scaffolder, Vue/Svelte wrappers | 🔲 Next | Lower onboarding friction |
+| **1.2** | Undo/redo, keyboard shortcuts, label presets, snap-to-grid, alignment | ✅ Done | Designer users can work confidently |
+| **1.3** | CONTRIBUTING.md, Vue/Svelte wrappers | ✅ Done | Lower onboarding friction |
 | **2** | Barcode, image element, shapes, CSV/Excel import, ZPL preview, sheet layout | 🔲 Planned | Production-ready for logistics/retail/HR |
 | **3** | Desktop app (Tauri) — Excel source, local layouts, direct ZPL print | 🔲 Planned | Standalone tool for non-developers |
 | **4** | Docs site, template gallery, CLI, all framework wrappers | 🔲 Ongoing | Community and ecosystem |
