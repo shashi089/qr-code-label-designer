@@ -37,6 +37,11 @@ Try the designer — no signup needed:
 - **Data Binding**: Bind any field like `{{name}}`, `{{id}}`, or `{{department}}` from your entity schema.
 - **Multi-Variable QR**: Set a separator (e.g. `|`) on QR elements to automatically join multiple fields into one scan.
 - **Rich Text Styling**: Customize font size, weight, and horizontal/vertical alignment directly in the designer. Font family, color, word-wrap, and line height are supported by the engine and can be set via JSON (`initialLayout` or saved layout) — see the [core README](../core/README.md#stickerelement-schema) for all style properties.
+- **Undo / Redo**: 20-step history with Ctrl+Z / Ctrl+Y keyboard shortcuts and header buttons.
+- **Keyboard Shortcuts**: Delete/Backspace removes element, Arrow keys nudge 1 unit, Shift+Arrow nudges 5 units, Ctrl+D duplicates, Escape deselects.
+- **Label Size Presets**: Dropdown with 7 common sizes (Badge 100×60 mm, Shipping Label 4"×6", Brother QL, and more) — resets inputs on apply.
+- **Snap-to-Grid**: Optional 1-unit grid snapping for drag and resize, with a live dot-grid overlay on the canvas.
+- **Element Alignment Toolbar**: 6 icon buttons (Align Left / Center / Right | Top / Center / Bottom) in the property panel — all recorded in the undo stack.
 - **Dark Mode**: Built-in light and dark themes that follow your app's color scheme.
 - **Flexible Units**: Design in millimeters, centimeters, inches, or pixels.
 - **JSON Output**: Save the layout as a compact JSON object to your backend or `localStorage`.

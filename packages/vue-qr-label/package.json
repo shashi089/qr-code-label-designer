@@ -1,0 +1,80 @@
+{
+  "name": "vue-qr-label",
+  "version": "0.1.0",
+  "description": "Vue 3 component for the QR Label Designer — drag-and-drop label designer with PDF, PNG, and ZPL export.",
+  "keywords": [
+    "vue",
+    "vue3",
+    "vue-component",
+    "composition-api",
+    "qr-code",
+    "qrcode",
+    "qr-layout",
+    "qr-label",
+    "vue-qr-label",
+    "label-designer",
+    "label-printing",
+    "badge-designer",
+    "shipping-label",
+    "inventory-label",
+    "sticker-designer",
+    "sticker-printer",
+    "drag-and-drop",
+    "drag-drop",
+    "visual-editor",
+    "pdf-export",
+    "png-export",
+    "zpl-printer",
+    "zpl-generator",
+    "zebra-printer",
+    "thermal-printer",
+    "batch-printing",
+    "typescript"
+  ],
+  "author": "Shashidhar Naik <shashidharnaik8@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/packages/vue-qr-label",
+  "bugs": {
+    "url": "https://github.com/shashi089/qr-code-layout-generate-tool/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shashi089/qr-code-layout-generate-tool.git",
+    "directory": "packages/vue-qr-label"
+  },
+  "type": "module",
+  "main": "./dist/vue-qr-label.cjs",
+  "module": "./dist/vue-qr-label.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-qr-label.js",
+      "require": "./dist/vue-qr-label.cjs"
+    },
+    "./style.css": "./dist/vue-qr-label.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "qrlayout-core": "^1.1.8",
+    "qrlayout-ui": "^1.1.1"
+  },
+  "peerDependencies": {
+    "vue": ">=3.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.3.3",
+    "vite": "^7.2.7",
+    "vite-plugin-dts": "^4.5.4",
+    "vue": "^3.5.13"
+  }
+}
