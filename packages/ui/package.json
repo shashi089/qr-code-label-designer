@@ -39,13 +39,13 @@
   ],
   "author": "Shashidhar Naik <shashidharnaik8@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/packages/ui#readme",
+  "homepage": "https://github.com/shashi089/qr-code-label-designer/tree/main/packages/ui#readme",
   "bugs": {
-    "url": "https://github.com/shashi089/qr-code-layout-generate-tool/issues"
+    "url": "https://github.com/shashi089/qr-code-label-designer/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shashi089/qr-code-layout-generate-tool.git",
+    "url": "git+https://github.com/shashi089/qr-code-label-designer.git",
     "directory": "packages/ui"
   },
   "engines": {

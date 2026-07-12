@@ -2,7 +2,17 @@
 export type Unit = "mm" | "px" | "cm" | "in";
 
 /** The kind of content an element renders. */
-export type ElementType = "text" | "qr";
+export type ElementType = "text" | "qr" | "barcode";
+
+/**
+ * Barcode symbology for `type: "barcode"` elements.
+ * - `CODE128`  — universal logistics, GS1, shipping (most common choice)
+ * - `EAN13`    — retail product labels (requires exactly 12 data digits; check digit auto-calculated)
+ * - `UPCA`     — US retail (requires exactly 11 data digits)
+ * - `CODE39`   — legacy MRO / industrial (alphanumeric + ` - . $ / + %`)
+ * - `ITF14`    — carton / pallet shipping (requires exactly 13 data digits)
+ */
+export type BarcodeFormat = "CODE128" | "EAN13" | "UPCA" | "CODE39" | "ITF14";
 
 /** Visual styling options for a text or QR element. */
 export interface ElementStyle {
@@ -88,6 +98,13 @@ export interface StickerElement {
      * @example qrSeparator: "|"  →  "{{id}}{{name}}" encodes as "EMP-001|John Doe"
      */
     qrSeparator?: string;
+
+    /**
+     * For barcode elements only — the symbology used to encode `content`.
+     * Defaults to `"CODE128"` when omitted.
+     * See `BarcodeFormat` for data format requirements per symbology.
+     */
+    barcodeFormat?: BarcodeFormat;
 
     /** Optional styling overrides for text elements. */
     style?: ElementStyle;

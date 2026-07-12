@@ -64,7 +64,7 @@ export function DocsPage() {
 
         <div className="mt-auto pt-8 border-t border-gray-200">
           <a
-            href="https://github.com/shashi089/qr-code-layout-generate-tool"
+            href="https://github.com/shashi089/qr-code-label-designer"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors px-2"
@@ -116,7 +116,7 @@ export function DocsPage() {
               </div>
               <div className="flex gap-3">
                 <a href="https://www.npmjs.com/package/react-qr-label" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300"><Download size={12} /> npm</a>
-                <a href="https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/packages/react-qr-label" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300"><Github size={12} /> source</a>
+                <a href="https://github.com/shashi089/qr-code-label-designer/tree/main/packages/react-qr-label" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300"><Github size={12} /> source</a>
               </div>
             </div>
             <div className="bg-gray-800 rounded-lg px-4 py-3 font-mono text-sm text-gray-200">
@@ -361,7 +361,7 @@ const combined  = zplBlocks.join('\\n');
         <div className="border-t border-gray-100 pt-10 flex flex-col sm:flex-row gap-4 items-center justify-between">
           <p className="text-gray-400 text-sm">Found an issue or want to contribute?</p>
           <a
-            href="https://github.com/shashi089/qr-code-layout-generate-tool"
+            href="https://github.com/shashi089/qr-code-label-designer"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-gray-900 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-700 transition-all"

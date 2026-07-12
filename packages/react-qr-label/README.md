@@ -6,11 +6,11 @@
 [![npm downloads](https://img.shields.io/npm/dm/react-qr-label.svg)](https://www.npmjs.com/package/react-qr-label)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
-[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-layout-generate-tool?style=social)](https://github.com/shashi089/qr-code-layout-generate-tool/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-label-designer?style=social)](https://github.com/shashi089/qr-code-label-designer/stargazers)
 
 Drop a fully featured label designer into your React app with a single component. Users can drag and drop elements, bind `{{variables}}` from your data schema, preview in real-time, and export to PDF, PNG, or ZPL for Zebra thermal printers.
 
-Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool) monorepo — also available for [Vue 3](../vue-qr-label), [Svelte 5](../svelte-qr-label), and [vanilla JS](../ui).
+Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-label-designer) monorepo — also available for [Vue 3](../vue-qr-label), [Svelte 5](../svelte-qr-label), and [vanilla JS](../ui).
 
 ---
 
@@ -18,9 +18,9 @@ Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generat
 
 Try the designer — no signup needed:
 
-[▶ Open React Demo](https://qr-layout-designer.netlify.app/) &nbsp;|&nbsp; [Source Code](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo)
+[▶ Open React Demo](https://qr-layout-designer.netlify.app/) &nbsp;|&nbsp; [Source Code](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/react-demo)
 
-![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-layout-generate-tool/raw/main/assets/layout_designer.png)
+![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-label-designer/raw/main/assets/layout_designer.png)
 
 ---
 
@@ -229,8 +229,8 @@ interface EntityField {
 | :--- | :--- |
 | [`qrlayout-core`](https://www.npmjs.com/package/qrlayout-core) | Headless engine — render PNG, PDF, ZPL without the UI |
 | [`qrlayout-ui`](https://www.npmjs.com/package/qrlayout-ui) | Framework-agnostic designer (vanilla TS) |
-<!-- | [`vue-qr-label`](https://www.npmjs.com/package/vue-qr-label) | Vue 3 wrapper |
-| [`svelte-qr-label`](https://www.npmjs.com/package/svelte-qr-label) | Svelte 5 wrapper | -->
+| [`vue-qr-label`](https://www.npmjs.com/package/vue-qr-label) | Vue 3 wrapper |
+| [`svelte-qr-label`](https://www.npmjs.com/package/svelte-qr-label) | Svelte 5 wrapper |
 
 ---
 
@@ -241,5 +241,5 @@ MIT © [Shashidhar Naik](https://github.com/shashi089)
 ---
 
 <p align="center">
-  <b>Found this useful? Please ⭐ the <a href="https://github.com/shashi089/qr-code-layout-generate-tool">GitHub repository</a> — it helps others discover the project!</b>
+  <b>Found this useful? Please ⭐ the <a href="https://github.com/shashi089/qr-code-label-designer">GitHub repository</a> — it helps others discover the project!</b>
 </p>

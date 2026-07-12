@@ -29,7 +29,7 @@ import { RouterLink } from 'vue-router';
                         <RouterLink to="/labels" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-teal-950 px-8 py-4 rounded-xl font-bold transition-all transform hover:-translate-y-1 shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2">
                             Start Designing <ArrowRight :size="20" />
                         </RouterLink>
-                        <a href="https://github.com/shashi089/qr-code-layout-generate-tool" target="_blank" class="w-full sm:w-auto justify-center bg-teal-800/40 hover:bg-teal-700/50 text-white border border-teal-700 decoration-none px-8 py-4 rounded-xl font-medium transition-all backdrop-blur-sm flex items-center gap-2">
+                        <a href="https://github.com/shashi089/qr-code-label-designer" target="_blank" class="w-full sm:w-auto justify-center bg-teal-800/40 hover:bg-teal-700/50 text-white border border-teal-700 decoration-none px-8 py-4 rounded-xl font-medium transition-all backdrop-blur-sm flex items-center gap-2">
                             View Logic
                         </a>
                     </div>

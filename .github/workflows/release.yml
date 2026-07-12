@@ -76,7 +76,7 @@ jobs:
             npm i qrlayout-core
             ```
 
-            See [CHANGELOG](https://github.com/shashi089/qr-code-layout-generate-tool/blob/main/packages/core/CHANGELOG.md) for details.
+            See [CHANGELOG](https://github.com/shashi089/qr-code-label-designer/blob/main/packages/core/CHANGELOG.md) for details.
           draft: false
           prerelease: false
         env:
@@ -149,7 +149,7 @@ jobs:
             npm i qrlayout-ui
             ```
 
-            See [CHANGELOG](https://github.com/shashi089/qr-code-layout-generate-tool/blob/main/packages/ui/CHANGELOG.md) for details.
+            See [CHANGELOG](https://github.com/shashi089/qr-code-label-designer/blob/main/packages/ui/CHANGELOG.md) for details.
           draft: false
           prerelease: false
         env:

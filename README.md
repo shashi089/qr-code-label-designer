@@ -8,7 +8,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/qrlayout-core.svg?label=core+downloads)](https://www.npmjs.com/package/qrlayout-core)
 [![npm downloads](https://img.shields.io/npm/dm/qrlayout-ui.svg?label=ui+downloads)](https://www.npmjs.com/package/qrlayout-ui)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
-[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-layout-generate-tool?style=social)](https://github.com/shashi089/qr-code-layout-generate-tool/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-label-designer?style=social)](https://github.com/shashi089/qr-code-label-designer/stargazers)
 
 > If this project saves you time, please consider giving it a ⭐ — it helps others find it!
 
@@ -20,10 +20,10 @@ Try the designer live — no signup required:
 
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
-| **React** | [▶ Open Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo) |
-| **Angular** | [▶ Open Demo](https://qr-layout-designer-angular-demo.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/angular-demo) |
-| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
-| **Vue 3** | [▶ Open Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/vue-demo) |
+| **React** | [▶ Open Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/react-demo) |
+| **Angular** | [▶ Open Demo](https://qr-layout-designer-angular-demo.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/angular-demo) |
+| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/svelte-demo) |
+| **Vue 3** | [▶ Open Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/vue-demo) |
 
 ![QR Layout Designer Screenshot](./assets/layout_designer.png)
 
@@ -190,7 +190,7 @@ pdf.save("badges.pdf");
 This monorepo is managed with **npm workspaces**:
 
 ```
-qr-code-layout-generate-tool/
+qr-code-label-designer/
 ├── packages/
 │   ├── core/          # qrlayout-core — headless rendering engine
 │   └── ui/            # qrlayout-ui  — visual drag-and-drop designer
@@ -217,8 +217,8 @@ qr-code-layout-generate-tool/
 
 ```bash
 # Clone the repo
-git clone https://github.com/shashi089/qr-code-layout-generate-tool.git
-cd qr-code-layout-generate-tool
+git clone https://github.com/shashi089/qr-code-label-designer.git
+cd qr-code-label-designer
 
 # Install all workspace dependencies
 npm install
@@ -250,7 +250,7 @@ Contributions, bug reports, and feature requests are welcome!
 4. Push to the branch: `git push origin feature/my-feature`
 5. Open a Pull Request
 
-Found a bug or have an idea? [Open an Issue →](https://github.com/shashi089/qr-code-layout-generate-tool/issues)
+Found a bug or have an idea? [Open an Issue →](https://github.com/shashi089/qr-code-label-designer/issues)
 
 ---
 

@@ -1,3 +1,4 @@
+import JsBarcode from 'jsbarcode';
 import { StickerLayout, StickerElement, StickerData, ImageFormat } from "../layout/schema";
 import { generateQR } from "../qr/generator";
 import { parseContent } from "../utils/parse";
@@ -92,6 +93,10 @@ export class StickerPrinter {
                     const qrUrl = await generateQR(filledContent);
                     await this.drawImage(ctx, qrUrl, x, y, w, h);
                 }
+            } else if (element.type === "barcode") {
+                if (filledContent) {
+                    this.drawBarcode(ctx, element, filledContent, x, y, w, h);
+                }
             } else if (element.type === "text") {
                 this.drawText(ctx, element, filledContent, x, y, w, h);
             }
@@ -160,6 +165,41 @@ export class StickerPrinter {
             results.push(await this.renderToDataURL(layout, data, options));
         }
         return results;
+    }
+
+    // ─── Internal: Barcode Rendering ─────────────────────────────────────────────
+
+    private drawBarcode(
+        ctx: CanvasRenderingContext2D,
+        el: StickerElement,
+        data: string,
+        x: number,
+        y: number,
+        w: number,
+        h: number
+    ): void {
+        const tempCanvas = this.createCanvas();
+        try {
+            JsBarcode(tempCanvas, data, {
+                format:       el.barcodeFormat || "CODE128",
+                displayValue: true,
+                margin:       0,
+                background:   el.style?.backgroundColor || "#ffffff",
+                lineColor:    el.style?.color           || "#000000",
+            });
+            ctx.drawImage(tempCanvas, x, y, w, h);
+        } catch {
+            // Invalid data for the chosen format — draw a visible error placeholder
+            ctx.save();
+            ctx.strokeStyle = "#cc0000";
+            ctx.lineWidth   = 1;
+            ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+            ctx.fillStyle   = "#cc0000";
+            ctx.font        = `9px sans-serif`;
+            ctx.textBaseline = "middle";
+            ctx.fillText("Invalid barcode data", x + 4, y + h / 2);
+            ctx.restore();
+        }
     }
 
     // ─── Internal: Text Rendering (with word wrap) ───────────────────────────────
@@ -399,6 +439,25 @@ export class StickerPrinter {
                     // ^FDQA,data — QA, prefix: Q=error-correction indicator (matches ^BQ d-param),
                     //              A=auto encoding mode selection
                     zpl += `^FO${x},${y}^BQN,2,${mag},${qrErrorLevel}${prefix}^FD${qrErrorLevel}A,${value}^FS\n`;
+
+                } else if (element.type === "barcode") {
+                    const hDots  = toDots(element.h, layout.unit, dpmm);
+                    const format = element.barcodeFormat || "CODE128";
+                    const { prefix, value } = escapeFieldData(filledContent);
+
+                    // Native ZPL barcode commands — no image conversion needed.
+                    // All commands: ^FO{x},{y} + barcode command + ^FD{data}^FS
+                    // Params: N=Normal orientation, hDots=bar height, Y=print interpretation line
+                    let barcodeCmd: string;
+                    switch (format) {
+                        case "EAN13":  barcodeCmd = `^BEN,${hDots},Y,N`;       break;
+                        case "UPCA":   barcodeCmd = `^BUN,${hDots},Y,N,N`;     break;
+                        case "CODE39": barcodeCmd = `^B3N,N,${hDots},Y,N`;     break;
+                        case "ITF14":  barcodeCmd = `^BIN,${hDots},Y,N`;       break;
+                        default:       barcodeCmd = `^BCN,${hDots},Y,N,N`;     break; // CODE128
+                    }
+
+                    zpl += `^FO${x},${y}${barcodeCmd}${prefix}^FD${value}^FS\n`;
                 }
             }
 

@@ -45,7 +45,7 @@ export function Nav() {
                   Next.js demo by
                 </p>
                 <a
-                  href="https://github.com/shashi089/qr-code-layout-generate-tool"
+                  href="https://github.com/shashi089/qr-code-label-designer"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"

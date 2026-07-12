@@ -6,11 +6,11 @@
 [![npm downloads](https://img.shields.io/npm/dm/qrlayout-ui.svg)](https://www.npmjs.com/package/qrlayout-ui)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
-[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-layout-generate-tool?style=social)](https://github.com/shashi089/qr-code-layout-generate-tool/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-label-designer?style=social)](https://github.com/shashi089/qr-code-label-designer/stargazers)
 
 Drop a professional label designer into your app in minutes. Supports drag-and-drop element placement, live preview, dark mode, data binding with `{{variables}}`, and layout export to JSON.
 
-Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool) monorepo.
+Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-label-designer) monorepo.
 
 ---
 
@@ -20,12 +20,12 @@ Try the designer — no signup needed:
 
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
-| **React** | [▶ Open Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo) |
-| **Angular** | [▶ Open Demo](https://qr-layout-designer-angular-demo.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/angular-demo) |
-| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
-| **Vue 3** | [▶ Open Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/vue-demo) |
+| **React** | [▶ Open Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/react-demo) |
+| **Angular** | [▶ Open Demo](https://qr-layout-designer-angular-demo.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/angular-demo) |
+| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/svelte-demo) |
+| **Vue 3** | [▶ Open Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/vue-demo) |
 
-![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-layout-generate-tool/raw/main/assets/layout_designer.png)
+![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-label-designer/raw/main/assets/layout_designer.png)
 
 ---
 
@@ -390,7 +390,7 @@ export class LabelDesignerComponent implements OnInit, OnDestroy {
 ## 🔗 Related
 
 - **[`qrlayout-core`](../core/README.md)** — Use the same layout JSON to render PNG, PDF, or ZPL without the UI
-- **[GitHub Repository](https://github.com/shashi089/qr-code-layout-generate-tool)** — Full monorepo, issue tracker, and discussions
+- **[GitHub Repository](https://github.com/shashi089/qr-code-label-designer)** — Full monorepo, issue tracker, and discussions
 
 ---
 
@@ -401,5 +401,5 @@ MIT © [Shashidhar Naik](https://github.com/shashi089)
 ---
 
 <p align="center">
-  <b>If this saved you time, please ⭐ the <a href="https://github.com/shashi089/qr-code-layout-generate-tool">GitHub repository</a> — it helps others find the project!</b>
+  <b>If this saved you time, please ⭐ the <a href="https://github.com/shashi089/qr-code-label-designer">GitHub repository</a> — it helps others find the project!</b>
 </p>
