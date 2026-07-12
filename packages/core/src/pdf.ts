@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
-import { StickerLayout } from "./layout/schema";
+import JsBarcode from 'jsbarcode';
+import { StickerLayout, StickerElement } from "./layout/schema";
 import { generateQR } from "./qr/generator";
 import { parseContent } from "./utils/parse";
 
@@ -20,6 +21,23 @@ async function resolveDataUrl(src: string): Promise<string | undefined> {
     });
   } catch (err) {
     console.warn("Could not resolve data URL", err);
+    return undefined;
+  }
+}
+
+function renderBarcodeToDataUrl(element: StickerElement, data: string): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  try {
+    const canvas = document.createElement("canvas");
+    JsBarcode(canvas, data, {
+      format:       element.barcodeFormat || "CODE128",
+      displayValue: true,
+      margin:       0,
+      background:   element.style?.backgroundColor || "#ffffff",
+      lineColor:    element.style?.color           || "#000000",
+    });
+    return canvas.toDataURL("image/png");
+  } catch {
     return undefined;
   }
 }
@@ -68,6 +86,12 @@ export async function exportToPDF(
         if (filledContent) {
           const qrUrl = await generateQR(filledContent);
           doc.addImage(qrUrl, "PNG", x, y, w, h);
+        }
+
+      } else if (element.type === "barcode") {
+        if (filledContent) {
+          const barcodeUrl = renderBarcodeToDataUrl(element, filledContent);
+          if (barcodeUrl) doc.addImage(barcodeUrl, "PNG", x, y, w, h);
         }
 
       } else if (element.type === "text") {

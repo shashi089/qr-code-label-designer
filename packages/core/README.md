@@ -6,7 +6,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/qrlayout-core.svg)](https://www.npmjs.com/package/qrlayout-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
-[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-layout-generate-tool?style=social)](https://github.com/shashi089/qr-code-layout-generate-tool/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-label-designer?style=social)](https://github.com/shashi089/qr-code-label-designer/stargazers)
 
 Create pixel-perfect QR code layouts and export them to **PNG**, **PDF**, or **ZPL** (Zebra thermal printers). Define your template once, render it anywhere.
 
@@ -22,10 +22,10 @@ See it working in real applications today:
 
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
-| **React** | [▶ Open Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/react-demo) |
-| **Angular** | [▶ Open Demo](https://qr-layout-designer-angular-demo.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/angular-demo) |
-| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
-| **Vue 3** | [▶ Open Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/vue-demo) |
+| **React** | [▶ Open Demo](https://qr-layout-designer.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/react-demo) |
+| **Angular** | [▶ Open Demo](https://qr-layout-designer-angular-demo.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/angular-demo) |
+| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/svelte-demo) |
+| **Vue 3** | [▶ Open Demo](https://qr-layout-designer-vue.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/vue-demo) |
 
 ---
 
@@ -302,7 +302,7 @@ console.log(zpl300[0]); // ^XA ... ^PW... ^LL... ^FO... ^XZ
 ## 🔗 Related
 
 - **[`qrlayout-ui`](../ui/README.md)** — The visual drag-and-drop designer built on top of this engine
-- **[GitHub Repository](https://github.com/shashi089/qr-code-layout-generate-tool)** — Full monorepo, examples, and issue tracker
+- **[GitHub Repository](https://github.com/shashi089/qr-code-label-designer)** — Full monorepo, examples, and issue tracker
 
 ---
 
@@ -313,5 +313,5 @@ MIT © [Shashidhar Naik](https://github.com/shashi089)
 ---
 
 <p align="center">
-  <b>Found this useful? Please ⭐ the <a href="https://github.com/shashi089/qr-code-layout-generate-tool">GitHub repository</a> — it helps others discover the project!</b>
+  <b>Found this useful? Please ⭐ the <a href="https://github.com/shashi089/qr-code-label-designer">GitHub repository</a> — it helps others discover the project!</b>
 </p>

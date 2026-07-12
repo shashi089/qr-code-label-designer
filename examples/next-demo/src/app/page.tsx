@@ -57,7 +57,7 @@ export default function HomePage() {
         <p className='mx-auto max-w-2xl text-lg text-gray-600'>
           A demo for{' '}
           <a
-            href='https://github.com/shashi089/qr-code-layout-generate-tool'
+            href='https://github.com/shashi089/qr-code-label-designer'
             className='font-medium text-indigo-600 hover:text-indigo-700'
           >
             QR Layout Tool

@@ -114,4 +114,4 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-[Unreleased]: https://github.com/shashi089/qr-code-layout-generate-tool/compare/HEAD
+[Unreleased]: https://github.com/shashi089/qr-code-label-designer/compare/HEAD

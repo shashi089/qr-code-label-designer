@@ -218,7 +218,7 @@ function App() {
                 {/* Desktop Actions */}
                 <div className="hidden lg:flex items-center gap-3">
                   <a
-                    href="https://github.com/shashi089/qr-code-layout-generate-tool"
+                    href="https://github.com/shashi089/qr-code-label-designer"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 font-bold px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"

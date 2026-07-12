@@ -89,7 +89,7 @@ The same `qrlayout-core` engine that powers the npm library **will power the des
 ## Current Package Architecture
 
 ```
-qr-code-layout-generate-tool/ (this repo)
+qr-code-label-designer/ (this repo)
 ├── packages/
 │   ├── qrlayout-core      → headless engine (render, PDF, ZPL, PNG)
 │   ├── qrlayout-ui        → visual drag-and-drop designer (vanilla TS)

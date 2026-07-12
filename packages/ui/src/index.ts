@@ -192,6 +192,7 @@ export class QRLayoutDesigner {
                             <div style="display: flex; gap: 6px">
                                 <button class="btn btn-outline btn-sm" data-action="add-text" title="Add Text">+ Text</button>
                                 <button class="btn btn-outline btn-sm" data-action="add-qr" title="Add QR">+ QR</button>
+                                <button class="btn btn-outline btn-sm" data-action="add-barcode" title="Add Barcode">+ Barcode</button>
                             </div>
                         </div>
                         <div data-el="elements-container" class="element-list" style="margin-top: 8px;"></div>
@@ -421,6 +422,14 @@ export class QRLayoutDesigner {
             this.updatePreview();
         });
 
+        this.container.querySelector('[data-action="add-barcode"]')?.addEventListener('click', () => {
+            this.snapshot();
+            const id = "b" + Date.now();
+            this.currentLayout.elements.push({ id, type: 'barcode', x: 5, y: 5, w: 50, h: 15, content: "{{id}}", barcodeFormat: 'CODE128' });
+            this.selectElement(id);
+            this.updatePreview();
+        });
+
         this.container.querySelector('[data-action="delete-element"]')?.addEventListener('click', () => {
             this.deleteSelectedElement();
         });
@@ -633,6 +642,16 @@ export class QRLayoutDesigner {
                 <label>Field Separator</label>
                 <input type="text" id="prop-qr-separator" placeholder="e.g. | or -" value="${el.qrSeparator || ''}">
                 ` : ''}
+                ${el.type === 'barcode' ? `
+                <label>Barcode Format</label>
+                <select id="prop-barcode-format">
+                    <option value="CODE128" ${(el.barcodeFormat || 'CODE128') === 'CODE128' ? 'selected' : ''}>CODE128 — Universal / Logistics</option>
+                    <option value="EAN13"   ${el.barcodeFormat === 'EAN13'   ? 'selected' : ''}>EAN-13 — Retail (12 digits)</option>
+                    <option value="UPCA"    ${el.barcodeFormat === 'UPCA'    ? 'selected' : ''}>UPC-A — US Retail (11 digits)</option>
+                    <option value="CODE39"  ${el.barcodeFormat === 'CODE39'  ? 'selected' : ''}>CODE39 — Industrial / MRO</option>
+                    <option value="ITF14"   ${el.barcodeFormat === 'ITF14'   ? 'selected' : ''}>ITF-14 — Carton / Pallet (13 digits)</option>
+                </select>
+                ` : ''}
                 <label>Content</label>
                 <textarea data-prop="content-val" rows="2">${el.content}</textarea>
                 <div class="field-buttons" data-el="field-suggestions"></div>
@@ -677,6 +696,11 @@ export class QRLayoutDesigner {
                     </div>
                 </div>
             ` : ''}
+            ${el.type === 'barcode' ? `
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 12px 0 0; line-height: 1.5;">
+                    EAN-13 needs 12 digits &nbsp;·&nbsp; UPC-A needs 11 digits &nbsp;·&nbsp; ITF-14 needs 13 digits
+                </p>
+            ` : ''}
         `;
 
         // Alignment toolbar buttons
@@ -709,6 +733,16 @@ export class QRLayoutDesigner {
         if (sepInput) {
             sepInput.addEventListener("input", (e) => {
                 el.qrSeparator = (e.target as HTMLInputElement).value;
+                this.updatePreview();
+            });
+        }
+
+        // Barcode format
+        const barcodeFormatSelect = this.propContent.querySelector("#prop-barcode-format");
+        if (barcodeFormatSelect) {
+            barcodeFormatSelect.addEventListener("change", (e) => {
+                this.snapshot();
+                (el as any).barcodeFormat = (e.target as HTMLSelectElement).value;
                 this.updatePreview();
             });
         }

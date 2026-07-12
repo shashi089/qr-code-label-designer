@@ -6,11 +6,11 @@
 [![npm downloads](https://img.shields.io/npm/dm/svelte-qr-label.svg)](https://www.npmjs.com/package/svelte-qr-label)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
-[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-layout-generate-tool?style=social)](https://github.com/shashi089/qr-code-layout-generate-tool/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/shashi089/qr-code-label-designer?style=social)](https://github.com/shashi089/qr-code-label-designer/stargazers)
 
 Drop a fully featured label designer into your Svelte 5 app with a single component. Users can drag and drop elements, bind `{{variables}}` from your data schema, preview in real-time, and export to PDF, PNG, or ZPL for Zebra thermal printers.
 
-Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-layout-generate-tool) monorepo — also available for [React](../react-qr-label), [Vue 3](../vue-qr-label), and [vanilla JS](../ui).
+Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-label-designer) monorepo — also available for [React](../react-qr-label), [Vue 3](../vue-qr-label), and [vanilla JS](../ui).
 
 ---
 
@@ -20,9 +20,9 @@ Try the designer — no signup needed:
 
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
-| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-layout-generate-tool/tree/main/examples/svelte-demo) |
+| **Svelte 5** | [▶ Open Demo](https://qr-layout-designer-svelte.netlify.app/) | [Source](https://github.com/shashi089/qr-code-label-designer/tree/main/examples/svelte-demo) |
 
-![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-layout-generate-tool/raw/main/assets/layout_designer.png)
+![QR Layout Designer Screenshot](https://github.com/shashi089/qr-code-label-designer/raw/main/assets/layout_designer.png)
 
 ---
 
@@ -273,5 +273,5 @@ MIT © [Shashidhar Naik](https://github.com/shashi089)
 ---
 
 <p align="center">
-  <b>Found this useful? Please ⭐ the <a href="https://github.com/shashi089/qr-code-layout-generate-tool">GitHub repository</a> — it helps others discover the project!</b>
+  <b>Found this useful? Please ⭐ the <a href="https://github.com/shashi089/qr-code-label-designer">GitHub repository</a> — it helps others discover the project!</b>
 </p>

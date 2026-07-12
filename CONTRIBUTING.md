@@ -14,8 +14,8 @@ Thank you for your interest in contributing! This document covers local setup, p
 ### First-time setup
 
 ```bash
-git clone https://github.com/shashi089/qr-code-layout-generate-tool.git
-cd qr-code-layout-generate-tool
+git clone https://github.com/shashi089/qr-code-label-designer.git
+cd qr-code-label-designer
 
 # Install all workspace dependencies
 npm install
@@ -59,7 +59,7 @@ npm --workspace packages/core run test:watch
 ## Project Structure
 
 ```
-qr-code-layout-generate-tool/
+qr-code-label-designer/
 ├── packages/
 │   ├── core/                  # qrlayout-core — headless engine (render, PDF, ZPL, PNG)
 │   ├── ui/                    # qrlayout-ui — drag-and-drop designer (vanilla TS)
@@ -135,7 +135,7 @@ qr-code-layout-generate-tool/
 
 ## Reporting Bugs
 
-Open an issue at https://github.com/shashi089/qr-code-layout-generate-tool/issues with:
+Open an issue at https://github.com/shashi089/qr-code-label-designer/issues with:
 
 - Steps to reproduce
 - Expected vs actual behaviour

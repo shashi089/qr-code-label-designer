@@ -42,7 +42,7 @@
 							Start Designing <ArrowRight size={20} />
 						</a>
 						<a
-							href="https://github.com/shashi089/qr-code-layout-generate-tool"
+							href="https://github.com/shashi089/qr-code-label-designer"
 							target="_blank"
 							class="decoration-none flex items-center gap-2 rounded-xl border border-orange-700 bg-orange-800/40 px-8 py-4 font-medium text-white backdrop-blur-sm transition-all hover:bg-orange-700/50"
 						>
