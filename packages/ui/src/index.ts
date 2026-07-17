@@ -37,19 +37,15 @@ export class QRLayoutDesigner {
     private printer: StickerPrinter;
     private onSaveCallback?: (layout: StickerLayout) => void;
 
-    // Phase 1.2: Undo / Redo
     private undoStack: string[] = [];
     private redoStack: string[] = [];
     private readonly MAX_UNDO = 20;
 
-    // Phase 1.2: Snap-to-grid
     private snapToGrid = false;
-    private readonly GRID_SIZE = 1; // in current layout units
+    private readonly GRID_SIZE = 1;
 
-    // Phase 1.2: Keyboard handler reference for cleanup
     private _keyHandler!: (e: KeyboardEvent) => void;
 
-    // DOM Elements
     private canvas!: HTMLCanvasElement;
     private editorOverlay!: HTMLDivElement;
     private elementsContainer!: HTMLDivElement;
@@ -61,7 +57,6 @@ export class QRLayoutDesigner {
     private undoBtn!: HTMLButtonElement;
     private redoBtn!: HTMLButtonElement;
 
-    // Inputs
     private inputs!: {
         entity: HTMLSelectElement;
         name: HTMLInputElement;
@@ -318,11 +313,9 @@ export class QRLayoutDesigner {
     }
 
     private bindEvents() {
-        // Undo / Redo buttons
         this.undoBtn.addEventListener('click', () => this.undo());
         this.redoBtn.addEventListener('click', () => this.redo());
 
-        // Global Buttons
         this.container.querySelector('[data-action="toggle-theme"]')?.addEventListener('click', (e) => {
             this.isDarkMode = !this.isDarkMode;
             this.container.classList.toggle("dark-mode", this.isDarkMode);
@@ -363,7 +356,6 @@ export class QRLayoutDesigner {
             });
         });
 
-        // Sidebar Toggles
         this.container.querySelector('#toggle-left')?.addEventListener('click', () => {
             this.leftSidebar.classList.toggle("show");
         });
@@ -372,7 +364,6 @@ export class QRLayoutDesigner {
             this.rightSidebar.classList.toggle("show");
         });
 
-        // Layout Inputs
         this.inputs.entity.onchange = (e) => {
             this.currentLayout.targetEntity = (e.target as HTMLSelectElement).value;
             this.renderSampleDataEditor();
@@ -405,7 +396,6 @@ export class QRLayoutDesigner {
             this.updatePreview();
         };
 
-        // Element Actions
         this.container.querySelector('[data-action="add-text"]')?.addEventListener('click', () => {
             this.snapshot();
             const id = "t" + Date.now();
@@ -434,13 +424,11 @@ export class QRLayoutDesigner {
             this.deleteSelectedElement();
         });
 
-        // Snap to grid toggle
         this.container.querySelector('[data-action="toggle-grid"]')?.addEventListener('change', (e) => {
             this.snapToGrid = (e.target as HTMLInputElement).checked;
             this.updateEditorOverlay();
         });
 
-        // Size preset
         const presetSelect = this.container.querySelector('[data-input="preset"]') as HTMLSelectElement;
         presetSelect?.addEventListener('change', (e) => {
             const val = (e.target as HTMLSelectElement).value;
@@ -450,7 +438,6 @@ export class QRLayoutDesigner {
             }
         });
 
-        // Keyboard shortcuts
         this._keyHandler = (e: KeyboardEvent) => {
             const tag = (document.activeElement as HTMLElement)?.tagName;
             const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
@@ -478,7 +465,6 @@ export class QRLayoutDesigner {
         };
         document.addEventListener('keydown', this._keyHandler);
 
-        // Resize observer to handle responsiveness
         new ResizeObserver(() => {
             if (this.container.offsetWidth > 768) {
                 this.leftSidebar.classList.remove("show");
@@ -703,14 +689,12 @@ export class QRLayoutDesigner {
             ` : ''}
         `;
 
-        // Alignment toolbar buttons
         this.propContent.querySelectorAll('.align-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.alignElement((btn as HTMLElement).dataset.align!);
             });
         });
 
-        // Suggestions from Props
         const suggestions = this.propContent.querySelector('[data-el="field-suggestions"]');
         const entitySchema = this.currentLayout.targetEntity ? this.entitySchemas[this.currentLayout.targetEntity] : null;
 
@@ -728,7 +712,6 @@ export class QRLayoutDesigner {
             });
         }
 
-        // QR separator
         const sepInput = this.propContent.querySelector("#prop-qr-separator");
         if (sepInput) {
             sepInput.addEventListener("input", (e) => {
@@ -737,7 +720,6 @@ export class QRLayoutDesigner {
             });
         }
 
-        // Barcode format
         const barcodeFormatSelect = this.propContent.querySelector("#prop-barcode-format");
         if (barcodeFormatSelect) {
             barcodeFormatSelect.addEventListener("change", (e) => {
@@ -818,7 +800,6 @@ export class QRLayoutDesigner {
             this.editorOverlay.style.height = this.canvas.style.height;
         }
 
-        // Update grid dots visual
         if (this.snapToGrid && this.pxPerUnit > 0) {
             const dotSpacing = this.GRID_SIZE * this.pxPerUnit;
             this.editorOverlay.style.setProperty('--grid-dot-spacing', `${dotSpacing}px`);
@@ -827,7 +808,6 @@ export class QRLayoutDesigner {
             this.editorOverlay.classList.remove('show-grid');
         }
 
-        // Reconcile DOM: remove stale items, keep existing ones
         const existingIds = new Set(this.currentLayout.elements.map(e => e.id));
         this.editorOverlay.querySelectorAll('.editor-item').forEach(node => {
             if (!existingIds.has((node as HTMLElement).dataset.id!)) node.remove();
@@ -933,8 +913,6 @@ export class QRLayoutDesigner {
         this.container.classList.remove("qrlayout-designer");
     }
 
-    // ── Phase 1.2: Undo / Redo ────────────────────────────────────────────────
-
     private snapshot(): void {
         this.undoStack.push(JSON.stringify(this.currentLayout));
         if (this.undoStack.length > this.MAX_UNDO) this.undoStack.shift();
@@ -973,8 +951,6 @@ export class QRLayoutDesigner {
         if (this.redoBtn) this.redoBtn.disabled = this.redoStack.length === 0;
     }
 
-    // ── Phase 1.2: Keyboard Shortcut Actions ─────────────────────────────────
-
     private nudgeSelected(key: string, step: number): void {
         const el = this.currentLayout.elements.find(e => e.id === this.selectedElementId);
         if (!el) return;
@@ -1010,8 +986,6 @@ export class QRLayoutDesigner {
         this.updatePreview();
     }
 
-    // ── Phase 1.2: Element Alignment ─────────────────────────────────────────
-
     private alignElement(direction: string): void {
         const el = this.currentLayout.elements.find(e => e.id === this.selectedElementId);
         if (!el) return;
@@ -1028,8 +1002,6 @@ export class QRLayoutDesigner {
         this.updatePreview();
         this.renderPropertyPanel();
     }
-
-    // ── Phase 1.2: Label Size Presets ─────────────────────────────────────────
 
     private applyPreset(value: string): void {
         const presets: Record<string, { width: number; height: number; unit: 'mm' | 'in' | 'cm' | 'px' }> = {

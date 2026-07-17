@@ -60,13 +60,11 @@ export async function exportToPDF(
 
     const data = dataList[i];
 
-    // Background fill
     if (layout.backgroundColor) {
       doc.setFillColor(layout.backgroundColor);
       doc.rect(0, 0, layout.width, layout.height, "F");
     }
 
-    // Background image
     if (layout.backgroundImage) {
       const dataUrl = await resolveDataUrl(layout.backgroundImage);
       if (dataUrl) {
@@ -100,29 +98,23 @@ export async function exportToPDF(
         const color      = style.color    || "#000000";
         const align      = style.textAlign    || "left";
         const vAlign     = style.verticalAlign || "top";
-        const shouldWrap = style.wordWrap !== false; // default: true
+        const shouldWrap = style.wordWrap !== false;
 
         doc.setFontSize(fontSize);
         doc.setTextColor(color);
 
-        // Horizontal anchor
         let drawX = x;
         if (align === "center") drawX = x + w / 2;
         if (align === "right")  drawX = x + w;
 
-        // Word-wrap: split text into lines that fit within the element width
-        // doc.splitTextToSize() is jsPDF's built-in word-wrap utility.
         const lines: string[] = shouldWrap
           ? doc.splitTextToSize(filledContent, w)
           : [filledContent];
 
-        // Approximate line height in the PDF unit (jsPDF uses pt internally;
-        // 1.15 * fontSize in pt, then convert to the layout unit)
-        // jsPDF's getLineHeightFactor() gives the configured multiplier (default 1.15).
+        // jsPDF uses pt internally; convert line height to layout unit
         const lineHeightFactor = doc.getLineHeightFactor?.() ?? (style.lineHeight ?? 1.25);
         const lineHeightInUnit = (fontSize * lineHeightFactor) * (pdfUnit === "pt" ? 1 : 25.4 / 72);
 
-        // Vertical alignment of the whole text block
         const blockHeight = lines.length * lineHeightInUnit;
         let drawY = y;
         if (vAlign === "middle") drawY = y + (h - blockHeight) / 2;

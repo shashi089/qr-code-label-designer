@@ -44,12 +44,11 @@ export function LayoutModule() {
         place: 'Mumbai'
     });
 
-    // Load from local storage and add defaults
     useEffect(() => {
         const saved = localStorage.getItem('qr-layouts');
         if (saved) {
             const parsed: SavedLayout[] = JSON.parse(saved);
-            // Migration: Ensure all legacy layouts have targetEntity='employee'
+            // legacy layouts pre-dating targetEntity default to 'employee'
             const migrated = parsed.map(l => ({
                 ...l,
                 targetEntity: l.targetEntity || 'employee'
@@ -277,7 +276,6 @@ export function LayoutModule() {
                                                         ...currentLayout,
                                                         targetEntity: entity
                                                     });
-                                                    // Automatically update test data to schema default
                                                     setTestData(ENTITY_SCHEMAS[entity].sampleData);
                                                 }}
                                             >
@@ -369,8 +367,8 @@ export function LayoutModule() {
                                     onChange={(e) => {
                                         try {
                                             setTestData(JSON.parse(e.target.value));
-                                        } catch (e) {
-                                            // Handle invalid JSON silently while typing
+                                        } catch {
+                                            // ignore mid-typing parse errors
                                         }
                                     }}
                                     sx={{ fontFamily: 'monospace', mb: 1 }}

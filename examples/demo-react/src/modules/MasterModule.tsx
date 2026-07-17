@@ -46,7 +46,6 @@ export function MasterModule({ type, icon }: MasterModuleProps) {
         if (savedData) {
             setRecords(JSON.parse(savedData));
         } else {
-            // Initial sample record
             const defaults = [{ ...schema.sampleData, id: '1' }];
             setRecords(defaults);
             localStorage.setItem(storageKey, JSON.stringify(defaults));
@@ -55,8 +54,7 @@ export function MasterModule({ type, icon }: MasterModuleProps) {
         const savedLayouts = localStorage.getItem('qr-layouts');
         if (savedLayouts) {
             const parsed: SavedLayout[] = JSON.parse(savedLayouts);
-            // Only show layouts matching this entity type
-            // Fallback: If no targetEntity is set, assume it's for employees (legacy support)
+            // layouts without targetEntity pre-date the field and default to 'employee'
             const filtered = parsed.filter(l =>
                 l.targetEntity === type || (!l.targetEntity && type === 'employee')
             );

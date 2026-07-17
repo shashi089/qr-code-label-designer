@@ -48,12 +48,6 @@ export interface ZplOptions {
 
 export class StickerPrinter {
 
-    // ─── Canvas Renderer ─────────────────────────────────────────────────────────
-
-    /**
-     * Render a single label onto an existing HTML Canvas element.
-     * The canvas dimensions are automatically set to match the layout size.
-     */
     public async renderToCanvas(
         layout: StickerLayout,
         data: StickerData,
@@ -65,7 +59,6 @@ export class StickerPrinter {
         canvas.width  = toPx(layout.width,  layout.unit);
         canvas.height = toPx(layout.height, layout.unit);
 
-        // Background
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (layout.backgroundColor) {
             ctx.fillStyle = layout.backgroundColor;
@@ -75,7 +68,6 @@ export class StickerPrinter {
             await this.drawImage(ctx, layout.backgroundImage, 0, 0, canvas.width, canvas.height);
         }
 
-        // Elements
         for (const element of layout.elements) {
             const x = toPx(element.x, layout.unit);
             const y = toPx(element.y, layout.unit);
@@ -103,13 +95,6 @@ export class StickerPrinter {
         }
     }
 
-    /**
-     * Render a single label and return it as a data URL string.
-     * Use this result as an `<img src>` or pass it to `URL.createObjectURL`.
-     *
-     * @param format  Image format: "png" (default), "jpeg", "jpg", or "webp"
-     * @param quality Compression quality for jpeg/webp (0.0–1.0). Ignored for png.
-     */
     public async renderToDataURL(
         layout: StickerLayout,
         data: StickerData,
@@ -122,18 +107,6 @@ export class StickerPrinter {
         return canvas.toDataURL(mime, options?.quality);
     }
 
-    /**
-     * Export a single label as a PNG `Blob` — ready for download or the File API.
-     *
-     * @example
-     * const blob = await printer.exportToPNG(layout, data);
-     * const url  = URL.createObjectURL(blob);
-     * const a    = document.createElement("a");
-     * a.href     = url;
-     * a.download = "label.png";
-     * a.click();
-     * URL.revokeObjectURL(url);
-     */
     public async exportToPNG(
         layout: StickerLayout,
         data: StickerData,
@@ -151,10 +124,6 @@ export class StickerPrinter {
         return new Blob([bytes], { type: mime });
     }
 
-    /**
-     * Batch-export multiple records as data URL strings (one per record).
-     * Useful for generating image previews for a list of items.
-     */
     public async exportImages(
         layout: StickerLayout,
         dataList: StickerData[],
@@ -166,8 +135,6 @@ export class StickerPrinter {
         }
         return results;
     }
-
-    // ─── Internal: Barcode Rendering ─────────────────────────────────────────────
 
     private drawBarcode(
         ctx: CanvasRenderingContext2D,
@@ -202,8 +169,6 @@ export class StickerPrinter {
         }
     }
 
-    // ─── Internal: Text Rendering (with word wrap) ───────────────────────────────
-
     private drawText(
         ctx: CanvasRenderingContext2D,
         el: StickerElement,
@@ -225,15 +190,12 @@ export class StickerPrinter {
         ctx.fillStyle = style.color || "#000";
         ctx.textAlign = (style.textAlign as CanvasTextAlign) || "left";
 
-        // Horizontal anchor point
         let drawX = x;
         if (style.textAlign === "center") drawX = x + w / 2;
         if (style.textAlign === "right")  drawX = x + w;
 
-        // ── Word-wrap: split text into lines that fit within w ────────────────
         const lines = this.wrapText(ctx, text, w, shouldWrap);
 
-        // ── Vertical alignment of the whole text block ────────────────────────
         const blockHeight = lines.length * lineHeight;
         let blockStartY: number;
 
@@ -242,20 +204,15 @@ export class StickerPrinter {
         } else if (style.verticalAlign === "bottom") {
             blockStartY = y + h - blockHeight;
         } else {
-            blockStartY = y; // "top" (default)
+            blockStartY = y;
         }
 
-        // ── Draw each line using "top" baseline for predictable positioning ───
         ctx.textBaseline = "top";
         lines.forEach((line, i) => {
             ctx.fillText(line, drawX, blockStartY + i * lineHeight);
         });
     }
 
-    /**
-     * Break `text` into an array of lines that each fit within `maxWidth` pixels.
-     * When `wrap` is false the original text is returned as a single-element array.
-     */
     private wrapText(
         ctx: CanvasRenderingContext2D,
         text: string,
@@ -287,8 +244,6 @@ export class StickerPrinter {
         return lines.length > 0 ? lines : [""];
     }
 
-    // ─── Internal: Image Drawing ─────────────────────────────────────────────────
-
     private drawImage(
         ctx: CanvasRenderingContext2D,
         url: string,
@@ -316,16 +271,7 @@ export class StickerPrinter {
         return document.createElement("canvas");
     }
 
-    // ─── PDF Export ──────────────────────────────────────────────────────────────
-
-    /**
-     * Export all records as a multi-page PDF document (one page per record).
-     * Requires the optional peer dependency: `npm install jspdf`
-     *
-     * @example
-     * const pdf = await printer.exportToPDF(layout, employees);
-     * pdf.save("badges.pdf");
-     */
+    /** Requires the optional peer dependency: `npm install jspdf` */
     public async exportToPDF(
         layout: StickerLayout,
         dataList: Record<string, any>[]
@@ -341,25 +287,9 @@ export class StickerPrinter {
         }
     }
 
-    // ─── ZPL Export ──────────────────────────────────────────────────────────────
-
     /**
-     * Export all records as ZPL (Zebra Programming Language) strings.
      * Returns one ZPL string per record — send each directly to a thermal printer.
-     *
-     * **Important:** Pass the `dpi` option matching your printer's physical resolution.
-     * Using the wrong DPI will cause all positions, sizes, and fonts to print at the
-     * wrong scale. Common values: `203` (default), `300`, `600`.
-     *
-     * @example
-     * // 203 DPI printer (default — no option needed)
-     * const pages = printer.exportToZPL(layout, employees);
-     *
-     * // 300 DPI printer
-     * const pages = printer.exportToZPL(layout, employees, { dpi: 300 });
-     *
-     * // 600 DPI printer with high error correction on QR codes
-     * const pages = printer.exportToZPL(layout, employees, { dpi: 600, qrErrorCorrection: 'H' });
+     * `dpi` must match your printer's physical setting; wrong DPI scales everything incorrectly.
      */
     public exportToZPL(
         layout: StickerLayout,
@@ -370,18 +300,7 @@ export class StickerPrinter {
         const dpmm             = dpi / 25.4;             // dots per mm (derived from actual DPI)
         const qrErrorLevel     = options?.qrErrorCorrection ?? "M"; // ZPL ^BQ d-param
 
-        /**
-         * Escape content for safe use inside a ZPL ^FD...^FS field.
-         *
-         * ZPL treats `^` as a command delimiter and `~` as a tilde command prefix.
-         * If user data contains either character, it breaks the ZPL stream.
-         *
-         * Fix: emit ^FH before the field, which tells the printer to interpret
-         * underscore-hex sequences. Then encode `^` as `_5E` and `~` as `_7E`.
-         * Any literal `_` in the data must also be escaped as `_5F`.
-         *
-         * Returns { prefix, escaped } where prefix is "^FH" or "".
-         */
+        // ^FH enables underscore-hex escaping in ^FD; needed when content has ^, ~, or _
         const escapeFieldData = (text: string): { prefix: string; value: string } => {
             const needsEscape = /[\^~_]/.test(text);
             if (!needsEscape) return { prefix: "", value: text };
@@ -397,8 +316,8 @@ export class StickerPrinter {
             const heightDots = toDots(layout.height, layout.unit, dpmm);
 
             let zpl = "^XA\n";
-            zpl += `^PW${widthDots}\n`;   // Label print width in dots
-            zpl += `^LL${heightDots}\n`;  // Label length in dots
+            zpl += `^PW${widthDots}\n`;
+            zpl += `^LL${heightDots}\n`;
 
             for (const element of layout.elements) {
                 const filledContent = parseContent(
@@ -415,11 +334,6 @@ export class StickerPrinter {
                     const fontHeightDots = Math.round(fontSizePt * (dpi / 72));
                     const { prefix, value } = escapeFieldData(filledContent);
 
-                    // ^FO  — field origin (x, y in dots)
-                    // ^A0N — scalable built-in font, Normal orientation, height x width
-                    // ^FH  — enable hex escaping in ^FD (only emitted when needed)
-                    // ^FD  — field data
-                    // ^FS  — field separator (end of field)
                     zpl += `^FO${x},${y}^A0N,${fontHeightDots},${fontHeightDots}${prefix}^FD${value}^FS\n`;
 
                 } else if (element.type === "qr") {
@@ -432,22 +346,12 @@ export class StickerPrinter {
                     const mag = Math.min(10, Math.max(1, Math.floor(wDots / 21)));
 
                     const { prefix, value } = escapeFieldData(filledContent);
-
-                    // ^FO   — field origin
-                    // ^BQN  — QR code, Normal orientation, model 2 (enhanced), mag, error-correction
-                    // ^FH   — hex escaping (only when content has ^ or ~)
-                    // ^FDQA,data — QA, prefix: Q=error-correction indicator (matches ^BQ d-param),
-                    //              A=auto encoding mode selection
                     zpl += `^FO${x},${y}^BQN,2,${mag},${qrErrorLevel}${prefix}^FD${qrErrorLevel}A,${value}^FS\n`;
 
                 } else if (element.type === "barcode") {
                     const hDots  = toDots(element.h, layout.unit, dpmm);
                     const format = element.barcodeFormat || "CODE128";
                     const { prefix, value } = escapeFieldData(filledContent);
-
-                    // Native ZPL barcode commands — no image conversion needed.
-                    // All commands: ^FO{x},{y} + barcode command + ^FD{data}^FS
-                    // Params: N=Normal orientation, hDots=bar height, Y=print interpretation line
                     let barcodeCmd: string;
                     switch (format) {
                         case "EAN13":  barcodeCmd = `^BEN,${hDots},Y,N`;       break;

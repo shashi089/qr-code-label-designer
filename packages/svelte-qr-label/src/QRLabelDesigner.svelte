@@ -6,7 +6,6 @@
     interface Props {
         initialLayout?: StickerLayout;
         entitySchemas?: Record<string, EntitySchema>;
-        /** Called when the user clicks "Save Layout". */
         onsave?: (layout: StickerLayout) => void;
         class?: string;
         style?: string;

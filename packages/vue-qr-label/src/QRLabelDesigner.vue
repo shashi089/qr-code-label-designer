@@ -7,16 +7,13 @@ import 'qrlayout-ui/style.css';
 interface Props {
     initialLayout?: StickerLayout;
     entitySchemas?: Record<string, EntitySchema>;
-    /** Additional CSS class applied to the container div. */
     class?: string;
-    /** Inline style object applied to the container div. */
     style?: Record<string, string>;
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    /** Emitted when the user clicks "Save Layout". */
     save: [layout: StickerLayout];
 }>();
 

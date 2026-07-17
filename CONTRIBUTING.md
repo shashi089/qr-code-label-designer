@@ -1,6 +1,6 @@
-# Contributing to QR Code Layout Generate Tool
+# Contributing
 
-Thank you for your interest in contributing! This document covers local setup, project structure, and the PR checklist.
+Local setup, project structure, and PR checklist.
 
 ---
 

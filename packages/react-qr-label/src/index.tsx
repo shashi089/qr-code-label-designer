@@ -2,9 +2,8 @@ import { useEffect, useRef } from 'react';
 import { QRLayoutDesigner, type DesignerOptions, type StickerLayout } from 'qrlayout-ui';
 import 'qrlayout-ui/style.css';
 
-// Re-export core/ui types and classes so developers don't have to import from multiple packages
 export { StickerPrinter } from 'qrlayout-ui';
-export type { StickerLayout, StickerElement } from 'qrlayout-ui';
+export type { StickerLayout, StickerElement, BarcodeFormat } from 'qrlayout-ui';
 export type { EntitySchema, EntityField, DesignerOptions } from 'qrlayout-ui';
 
 export interface QRLabelDesignerProps extends Omit<DesignerOptions, 'element'> {
@@ -26,7 +25,6 @@ export function QRLabelDesigner({ className, style, ...options }: QRLabelDesigne
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Destroy any existing instance before mounting a new one
     if (designerRef.current) {
       designerRef.current.destroy();
       designerRef.current = null;
@@ -50,7 +48,6 @@ export function QRLabelDesigner({ className, style, ...options }: QRLabelDesigne
     };
   }, [initialLayoutStr, entitySchemasStr]);
 
-  // Keep callback refs updated on every render
   useEffect(() => {
     if (designerRef.current) {
       (designerRef.current as any).onSaveCallback = (layout: StickerLayout) => {

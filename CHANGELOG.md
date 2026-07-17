@@ -8,36 +8,30 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Added (Phase 1.3 — Developer Experience)
-- `packages/vue-qr-label` — new Vue 3 Composition API wrapper package
+### Added
+- `packages/vue-qr-label` — Vue 3 Composition API wrapper
   - `<QRLabelDesigner :initial-layout :entity-schemas @save />` component
   - Reactive re-mount when `initialLayout` or `entitySchemas` change; callback updates without re-creating
-  - Vite library build with `@vitejs/plugin-vue` + `vite-plugin-dts`
-- `packages/svelte-qr-label` — new Svelte 5 rune-based wrapper package
+- `packages/svelte-qr-label` — Svelte 5 rune-based wrapper
   - `<QRLabelDesigner {entitySchemas} onsave={fn} />` component
-  - Uses `$effect` for reactive lifecycle; cleanup returned from effect handles unmount
-  - Vite library build with `@sveltejs/vite-plugin-svelte` + `vite-plugin-dts`
-- `CONTRIBUTING.md` — local setup, package map, PR checklist, coding conventions
+  - Uses `$effect` for reactive lifecycle; cleanup on unmount
+- `CONTRIBUTING.md`
 - Root `package.json` scripts: `build:vue`, `build:svelte`, `build:all`, `publish:vue`, `publish:svelte`
-
-### Added (Phase 1.2 — Designer UX)
-- **Undo / Redo** (`Ctrl+Z` / `Ctrl+Y`) — 20-step snapshot stack; undo/redo buttons in header; property inputs use focus/blur snapshot pattern
-- **Keyboard shortcuts** — `Delete`/`Backspace` deletes element, Arrow nudges 1 unit, `Shift+Arrow` nudges 5 units, `Ctrl+D` duplicates, `Escape` deselects
-- **Label size presets** dropdown in Layout Settings (7 common mm and inch sizes)
-- **Snap-to-grid** toggle in canvas toolbar — snaps drag and resize to 1-unit grid; indigo dot grid overlay scales with canvas
-- **Element alignment toolbar** in property panel — 6 icon buttons: Left / Center-H / Right | Top / Center-V / Bottom; all actions are recorded in undo stack
-
-### Added (Phase 1.1 — Core Engine Hardening)
-- `parseContent` and `toPx` / `toDots` extracted into `src/utils/` — now exported from the package for reuse
+- **Undo / Redo** (`Ctrl+Z` / `Ctrl+Y`) — 20-step snapshot stack; property inputs use focus/blur snapshot pattern
+- **Keyboard shortcuts** — `Delete`/`Backspace`, Arrow nudge, `Shift+Arrow` ×5, `Ctrl+D` duplicate, `Escape` deselect
+- **Label size presets** dropdown (7 common mm and inch sizes)
+- **Snap-to-grid** — 1-unit grid with dot overlay that scales with canvas zoom
+- **Element alignment toolbar** — 6 directions; all actions recorded in undo stack
+- `parseContent` and `toPx` / `toDots` extracted into `src/utils/` and exported from the package
 - Vitest test suite for `qrlayout-core` — 54 tests covering `parseContent`, unit conversion, and ZPL generation
-- `test` and `test:watch` npm scripts in `qrlayout-core`
-- Full TSDoc on all public interfaces and types in `schema.ts`
-- GitHub Actions CI workflow (`.github/workflows/ci.yml`) — type-checks and runs tests on every push and PR
+- `test` and `test:watch` scripts in `qrlayout-core`
+- GitHub Actions CI (`.github/workflows/ci.yml`) — type-check and test on every push and PR
+- **Barcode element** (`type: "barcode"`) — `CODE128`, `EAN13`, `UPCA`, `CODE39`, `ITF14` via `jsbarcode`; canvas, PDF, ZPL, and designer UI all supported
 
 ### Changed
-- `pdf.ts` now imports `parseContent` from the shared utils module instead of defining its own copy
-- Removed orphaned `packages/react-qr-label-designer` folder (no source code; was only stale build artefacts)
-- Canvas renderer now converts `fontSize` pt → px using `pt × (96/72)` — all three renderers (PNG, PDF, ZPL) now consistently treat `fontSize` as points
+- `pdf.ts` imports `parseContent` from shared utils instead of its own copy
+- Canvas renderer converts `fontSize` pt → px via `pt × (96/72)` — all three renderers now consistently treat `fontSize` as points
+- Removed orphaned `packages/react-qr-label-designer` (stale build artefacts, no source)
 
 ---
 
