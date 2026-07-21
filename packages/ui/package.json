@@ -35,7 +35,10 @@
     "zebra-printer",
     "thermal-printer",
     "pdf-export",
-    "png-export"
+    "png-export",
+    "barcode",
+    "barcode-generator",
+    "label-maker"
   ],
   "author": "Shashidhar Naik <shashidharnaik8@gmail.com>",
   "license": "MIT",

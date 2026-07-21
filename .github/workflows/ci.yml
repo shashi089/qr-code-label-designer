@@ -27,11 +27,20 @@ jobs:
       - name: Build core
         run: npm run build:core
 
+      - name: Build ui
+        run: npm run build:ui
+
       - name: Type-check UI
         run: npm --workspace packages/ui exec tsc --noEmit
 
       - name: Type-check react-qr-label
         run: npm --workspace packages/react-qr-label exec tsc --noEmit
+
+      - name: Type-check vue-qr-label
+        run: npm --workspace packages/vue-qr-label exec tsc --noEmit
+
+      - name: Type-check svelte-qr-label
+        run: npm --workspace packages/svelte-qr-label exec tsc --noEmit
 
       - name: Run tests (qrlayout-core)
         run: npm test --workspace packages/core

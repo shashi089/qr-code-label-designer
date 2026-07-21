@@ -29,7 +29,11 @@
     "zebra-printer",
     "thermal-printer",
     "batch-printing",
-    "typescript"
+    "typescript",
+    "barcode",
+    "barcode-generator",
+    "label-maker",
+    "svelte-barcode"
   ],
   "author": "Shashidhar Naik <shashidharnaik8@gmail.com>",
   "license": "MIT",

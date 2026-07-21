@@ -30,7 +30,10 @@
     "react",
     "vue",
     "svelte",
-    "angular"
+    "angular",
+    "barcode",
+    "barcode-generator",
+    "label-maker"
   ],
   "author": "Shashidhar Naik <shashidharnaik8@gmail.com>",
   "license": "MIT",

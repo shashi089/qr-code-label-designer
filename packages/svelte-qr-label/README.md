@@ -14,9 +14,7 @@ Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-label-designer
 
 ---
 
-## 🚀 Live Demo
-
-Try the designer — no signup needed:
+## Live Demo
 
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
@@ -26,9 +24,9 @@ Try the designer — no signup needed:
 
 ---
 
-## ✨ Features
+## Features
 
-- **Drag & Drop Designer** — visually place and resize text and QR code elements on a canvas
+- **Drag & Drop Designer** — visually place and resize text, QR, and barcode elements on a canvas
 - **Live Preview** — see your label render with real sample data as you design
 - **`{{variable}}` Data Binding** — bind fields like `{{name}}`, `{{id}}`, `{{department}}` from your entity schema
 - **Multi-Variable QR** — join multiple fields into one QR scan with a configurable separator
@@ -44,7 +42,7 @@ Try the designer — no signup needed:
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install svelte-qr-label
@@ -52,11 +50,11 @@ npm install svelte-qr-label
 
 `qrlayout-core` and `qrlayout-ui` are included as direct dependencies — no extra installs needed.
 
-**Requirements:** Svelte 5.0+ as a peer dependency (already installed in any Svelte 5 app).
+**Requirements:** Svelte 5.0+ as a peer dependency.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```svelte
 <script lang="ts">
@@ -81,7 +79,6 @@ npm install svelte-qr-label
   };
 
   function handleSave(layout: StickerLayout) {
-    // layout is a plain JSON object — save to your backend or localStorage
     console.log('Saved:', layout);
   }
 </script>
@@ -102,7 +99,6 @@ npm install svelte-qr-label
   import 'svelte-qr-label/style.css';
   import type { StickerLayout } from 'svelte-qr-label';
 
-  // Load from your API or localStorage
   let savedLayout = $state<StickerLayout | undefined>(
     JSON.parse(localStorage.getItem('myLayout') ?? 'null') ?? undefined
   );
@@ -122,7 +118,7 @@ npm install svelte-qr-label
 
 ---
 
-## ⚙️ Props
+## Props
 
 | Prop | Type | Required | Description |
 | :--- | :--- | :---: | :--- |
@@ -134,19 +130,9 @@ npm install svelte-qr-label
 
 ---
 
-## 💾 Save & Print Workflow
+## Save & Print Workflow
 
 The designer produces a plain JSON layout object. Pass it with real data to `StickerPrinter` (re-exported from `svelte-qr-label`) to generate PDF, PNG, or ZPL output.
-
-```
-  User designs in <QRLabelDesigner />
-          │ onsave={handleSave}
-          ▼
-  Save layoutJSON to your DB / localStorage
-          │ load layoutJSON + real records
-          ▼
-  StickerPrinter → PDF / PNG / ZPL
-```
 
 ### Export to PDF
 
@@ -166,11 +152,7 @@ pdf.save('badges.pdf');
 import { StickerPrinter } from 'svelte-qr-label';
 
 const printer = new StickerPrinter();
-
-// Returns one ZPL string per record
 const zplPages = printer.exportToZPL(layoutJSON, records, { dpi: 203 });
-
-// Send to printer via socket on port 9100
 ```
 
 ### Export to PNG
@@ -192,7 +174,7 @@ for (const record of records) {
 
 ---
 
-## 📖 TypeScript Types
+## TypeScript Types
 
 ```typescript
 interface StickerLayout {
@@ -208,23 +190,24 @@ interface StickerLayout {
 
 interface StickerElement {
   id: string;
-  type: 'text' | 'qr';
+  type: 'text' | 'qr' | 'barcode';
   x: number;
   y: number;
   w: number;
   h: number;
-  content: string;        // static text or "{{variable}}" placeholder
-  qrSeparator?: string;   // joins multiple {{fields}} in a QR code
+  content: string;
+  qrSeparator?: string;
+  barcodeFormat?: 'CODE128' | 'EAN13' | 'UPCA' | 'CODE39' | 'ITF14';
   style?: {
-    fontSize?: number;           // font size in pt — consistent across PNG, PDF, ZPL
+    fontSize?: number;
     fontWeight?: 'normal' | 'bold';
     textAlign?: 'left' | 'center' | 'right';
     verticalAlign?: 'top' | 'middle' | 'bottom';
-    fontFamily?: string;         // e.g. 'Inter, sans-serif'
-    color?: string;              // text color hex e.g. '#333333'
-    backgroundColor?: string;   // element background hex
-    wordWrap?: boolean;          // default: true
-    lineHeight?: number;         // multiplier, default: 1.25
+    fontFamily?: string;
+    color?: string;
+    backgroundColor?: string;
+    wordWrap?: boolean;
+    lineHeight?: number;
   };
 }
 
@@ -235,14 +218,14 @@ interface EntitySchema {
 }
 
 interface EntityField {
-  name: string;   // used in {{name}} placeholders
-  label: string;  // shown in the designer UI
+  name: string;
+  label: string;
 }
 ```
 
 ---
 
-## 🎯 Use Cases
+## Use Cases
 
 | Industry | Application |
 | :--- | :--- |
@@ -255,7 +238,7 @@ interface EntityField {
 
 ---
 
-## 🔗 Related Packages
+## Related Packages
 
 | Package | Description |
 | :--- | :--- |
@@ -266,12 +249,18 @@ interface EntityField {
 
 ---
 
-## 📄 License
+## 🤝 Contributors
+
+- [@JayanthVishnu](https://github.com/JayanthVishnu)
+- [@arun270892](https://github.com/arun270892)
+
+---
+
+## License
 
 MIT © [Shashidhar Naik](https://github.com/shashi089)
 
 ---
 
-<p align="center">
-  <b>Found this useful? Please ⭐ the <a href="https://github.com/shashi089/qr-code-label-designer">GitHub repository</a> — it helps others discover the project!</b>
-</p>
+> Found this useful? Please [⭐ star the repository](https://github.com/shashi089/qr-code-label-designer) — it helps others discover the project!
+

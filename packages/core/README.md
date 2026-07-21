@@ -1,6 +1,6 @@
 # qrlayout-core
 
-**A high-performance, framework-agnostic QR code label rendering engine for Node.js and the browser.**
+**A framework-agnostic QR code label rendering engine for Node.js and the browser.**
 
 [![npm version](https://img.shields.io/npm/v/qrlayout-core.svg)](https://www.npmjs.com/package/qrlayout-core)
 [![npm downloads](https://img.shields.io/npm/dm/qrlayout-core.svg)](https://www.npmjs.com/package/qrlayout-core)
@@ -16,9 +16,7 @@ Create pixel-perfect QR code layouts and export them to **PNG**, **PDF**, or **Z
 
 ---
 
-## 🚀 Live Demos & Examples
-
-See it working in real applications today:
+## Live Demos
 
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
@@ -29,19 +27,20 @@ See it working in real applications today:
 
 ---
 
-## ✨ Core Features
+## Features
 
-- 📐 **Industrial Precision**: Define layouts in `mm`, `cm`, `in`, or `px` — renders accurately regardless of screen DPI.
-- 🖨️ **ZPL Support**: Direct export to Zebra Programming Language for industrial thermal label printers.
-- 📦 **Mail-Merge Batch Processing**: Define `{{variable}}` placeholders in your template, then generate hundreds of personalized labels in a single call.
-- 🌐 **Runs Everywhere**: Browser (Canvas), Node.js (Buffer), PDF (`jspdf`), or ZPL string — all from the same API.
-- 🔗 **Multi-Variable QR**: Use `qrSeparator` to join multiple fields into one QR code (e.g., `EMP-001|Alice|Engineering`).
-- 📝 **Automatic Word Wrap**: Long text wraps within its element boundary in both PNG and PDF output. Control wrapping per-element with `style.wordWrap` and `style.lineHeight`.
-- ⚡ **Zero UI dependency**: Use this package alone for server-side generation, automations, or CLI tools.
+- **Industrial Precision** — Define layouts in `mm`, `cm`, `in`, or `px`; renders accurately regardless of screen DPI.
+- **ZPL Support** — Direct export to Zebra Programming Language for industrial thermal label printers.
+- **Mail-Merge Batch Processing** — Define `{{variable}}` placeholders in your template, then generate hundreds of personalized labels in a single call.
+- **Runs Everywhere** — Browser (Canvas), Node.js (Buffer), PDF (`jspdf`), or ZPL string — all from the same API.
+- **Multi-Variable QR** — Use `qrSeparator` to join multiple fields into one QR code (e.g., `EMP-001|Alice|Engineering`).
+- **Automatic Word Wrap** — Long text wraps within its element boundary in both PNG and PDF output. Control per-element with `style.wordWrap` and `style.lineHeight`.
+- **Barcode Support** — `CODE128`, `EAN13`, `UPCA`, `CODE39`, and `ITF14` via `jsbarcode`; works across PNG, PDF, and ZPL.
+- **Zero UI dependency** — Use this package alone for server-side generation, automations, or CLI tools.
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install qrlayout-core
@@ -49,11 +48,9 @@ npm install qrlayout-core
 
 ---
 
-## ⌨️ Quick Start
+## Quick Start
 
 ### 1. Define a Layout Template
-
-A layout is a plain JSON schema describing physical dimensions and visual elements.
 
 ```typescript
 import { type StickerLayout } from "qrlayout-core";
@@ -84,7 +81,7 @@ const template: StickerLayout = {
       type: "qr",
       x: 35, y: 28, w: 30, h: 30,
       content: "{{id}}",
-      qrSeparator: "|"  // joins multiple {{fields}} with this separator
+      qrSeparator: "|"
     }
   ]
 };
@@ -96,7 +93,6 @@ const template: StickerLayout = {
 import { StickerPrinter } from "qrlayout-core";
 
 const printer = new StickerPrinter();
-
 const data = { name: "Alice Johnson", department: "Engineering", id: "EMP-001" };
 const canvas = document.getElementById("preview") as HTMLCanvasElement;
 
@@ -116,17 +112,14 @@ const employees = [
   { name: "Charlie Pereira", department: "Warehouse",     id: "EMP-003" },
 ];
 
-// Returns an array of ZPL strings, one per record
 const zplPages = printer.exportToZPL(template, employees);
-
-// Send zplPages[0] directly to a Zebra printer
 console.log(zplPages[0]);
 ```
 
-### 4. Export to PNG (Download)
+### 4. Export to PNG
 
 ```typescript
-// Option A — get a Blob (for download or File API)
+// Blob (for download or File API)
 const blob = await printer.exportToPNG(template, data);
 const url  = URL.createObjectURL(blob);
 const a    = document.createElement("a");
@@ -135,13 +128,13 @@ a.download = "badge-emp-001.png";
 a.click();
 URL.revokeObjectURL(url);
 
-// Option B — get a data URL string (for <img src> or canvas)
+// Data URL (for <img src> or canvas)
 const dataUrl = await printer.renderToDataURL(template, data, { format: "png" });
 ```
 
 ---
 
-## 📄 PDF Export (Optional)
+## PDF Export
 
 PDF support is an optional add-on to keep the core bundle lean.
 
@@ -150,26 +143,23 @@ npm install jspdf
 ```
 
 ```typescript
-// Via the sub-path export (tree-shakeable)
 import { exportToPDF } from "qrlayout-core/pdf";
 
 const pdf = await exportToPDF(template, employees);
 pdf.save("all-badges.pdf");
 
-// Or via the StickerPrinter class
+// Or via StickerPrinter
 const pdf = await printer.exportToPDF(template, employees);
 pdf.save("all-badges.pdf");
 ```
 
 > [!NOTE]
 > Text in PDF output automatically wraps within each element's width — the same as PNG.
-> To disable wrapping for a specific element, set `style.wordWrap: false` in that element's style.
+> To disable wrapping for a specific element, set `style.wordWrap: false`.
 
 ---
 
-## 🖨️ ZPL Export (Zebra Printers)
-
-Export directly to ZPL for Zebra and compatible thermal label printers.
+## ZPL Export (Zebra Printers)
 
 > [!IMPORTANT]
 > Always pass the `dpi` option matching your printer's **physical DPI setting**.
@@ -181,7 +171,7 @@ import { StickerPrinter } from "qrlayout-core";
 
 const printer = new StickerPrinter();
 
-// 203 DPI — standard desktop Zebra printers (default, no option needed)
+// 203 DPI — standard desktop Zebra printers (default)
 const zpl203 = printer.exportToZPL(template, employees);
 
 // 300 DPI — mid-range / high-quality printers
@@ -189,9 +179,6 @@ const zpl300 = printer.exportToZPL(template, employees, { dpi: 300 });
 
 // 600 DPI with high QR error correction (for harsh environments)
 const zpl600 = printer.exportToZPL(template, employees, { dpi: 600, qrErrorCorrection: "H" });
-
-// Each call returns one ZPL string per record
-console.log(zpl300[0]); // ^XA ... ^PW... ^LL... ^FO... ^XZ
 ```
 
 ### ZPL Options
@@ -210,13 +197,11 @@ console.log(zpl300[0]); // ^XA ... ^PW... ^LL... ^FO... ^XZ
 | `600` | ~23.6 dots/mm | ZT610, ZT620, ZD621 |
 
 > [!NOTE]
-> **Special characters in data:** If your data contains `^` or `~` characters (ZPL control characters),
-> `exportToZPL()` automatically escapes them using ZPL's `^FH` hex-encoding mechanism.
-> You do not need to sanitize your data before passing it in.
+> If your data contains `^` or `~` characters (ZPL control characters), `exportToZPL()` automatically escapes them using ZPL's `^FH` hex-encoding mechanism. You do not need to sanitize your data before passing it in.
 
 ---
 
-## 📖 API Reference
+## API Reference
 
 ### `StickerLayout` Schema
 
@@ -232,61 +217,39 @@ console.log(zpl300[0]); // ^XA ... ^PW... ^LL... ^FO... ^XZ
 
 ### `StickerElement` Schema
 
-| Attribute | Type | Required | UI Designer | Description |
-|---|---|---|---|---|
-| `id` | `string` | ✅ | Auto-generated | Unique element identifier |
-| `type` | `text \| qr` | ✅ | `+ Text` / `+ QR` buttons | Component type |
-| `content` | `string` | ✅ | ✅ Content textarea | Static text or `{{variable}}` template |
-| `x`, `y` | `number` | ✅ | ✅ Drag on canvas or number inputs | Position from top-left origin (in layout units) |
-| `w`, `h` | `number` | ✅ | ✅ Resize handle or number inputs | Width and height (in layout units) |
-| `qrSeparator` | `string` | ❌ | ✅ "Field Separator" input (QR only) | Joins consecutive `{{variables}}` in a single QR scan |
-| `style.fontSize` | `number` | ❌ | ✅ "Font Size" input (text only) | Font size in **points (pt)**. Consistent across PNG, PDF, and ZPL output. Default: `12`. |
-| `style.fontWeight` | `normal \| bold` | ❌ | ✅ "Font Weight" dropdown (text only) | Font weight |
-| `style.textAlign` | `left \| center \| right` | ❌ | ✅ "Horizontal Align" toggle (text only) | Horizontal text alignment |
-| `style.verticalAlign` | `top \| middle \| bottom` | ❌ | ✅ "Vertical Align" toggle (text only) | Vertical text alignment |
-| `style.fontFamily` | `string` | ❌ | ❌ JSON only | CSS font family (e.g. `'Inter, sans-serif'`) |
-| `style.color` | `string` | ❌ | ❌ JSON only | Text color (hex, e.g. `'#333333'`) |
-| `style.backgroundColor` | `string` | ❌ | ❌ JSON only | Element background fill color (hex) |
-| `style.wordWrap` | `boolean` | ❌ | ❌ JSON only | Wrap text to next line when it exceeds element width. Default: `true`. Set `false` for forced single-line. |
-| `style.lineHeight` | `number` | ❌ | ❌ JSON only | Line height multiplier relative to `fontSize`. Default: `1.25`. E.g. `1.5` adds more space between lines. |
-
-> [!NOTE]
-> Properties marked **"JSON only"** are fully supported by the rendering engine but are not yet exposed in the `qrlayout-ui` designer panel. Set them directly in the layout JSON when loading via `initialLayout` or when saving/loading from your backend.
-
-**JSON-only example:**
-```typescript
-{
-  id: "label-header",
-  type: "text",
-  x: 5, y: 5, w: 90, h: 12,
-  content: "{{name}}",
-  style: {
-    fontSize: 14,
-    fontWeight: "bold",
-    textAlign: "center",
-    fontFamily: "Inter, sans-serif",   // ← JSON only
-    color: "#1a1a2e",                  // ← JSON only
-    backgroundColor: "#f0f4ff",        // ← JSON only
-    wordWrap: true,                    // ← JSON only (default: true)
-    lineHeight: 1.4                    // ← JSON only (default: 1.25)
-  }
-}
-```
+| Attribute | Type | Required | Description |
+|---|---|---|---|
+| `id` | `string` | ✅ | Unique element identifier |
+| `type` | `text \| qr \| barcode` | ✅ | Component type |
+| `content` | `string` | ✅ | Static text or `{{variable}}` template |
+| `x`, `y` | `number` | ✅ | Position from top-left origin (in layout units) |
+| `w`, `h` | `number` | ✅ | Width and height (in layout units) |
+| `qrSeparator` | `string` | ❌ | Joins consecutive `{{variables}}` in a single QR scan |
+| `barcodeFormat` | `CODE128 \| EAN13 \| UPCA \| CODE39 \| ITF14` | ❌ | Required when `type` is `barcode` |
+| `style.fontSize` | `number` | ❌ | Font size in **points (pt)**. Consistent across PNG, PDF, and ZPL. Default: `12`. |
+| `style.fontWeight` | `normal \| bold` | ❌ | Font weight |
+| `style.textAlign` | `left \| center \| right` | ❌ | Horizontal text alignment |
+| `style.verticalAlign` | `top \| middle \| bottom` | ❌ | Vertical text alignment |
+| `style.fontFamily` | `string` | ❌ | CSS font family (e.g. `'Inter, sans-serif'`) |
+| `style.color` | `string` | ❌ | Text color (hex, e.g. `'#333333'`) |
+| `style.backgroundColor` | `string` | ❌ | Element background fill color (hex) |
+| `style.wordWrap` | `boolean` | ❌ | Wrap text when it exceeds element width. Default: `true`. |
+| `style.lineHeight` | `number` | ❌ | Line height multiplier. Default: `1.25`. |
 
 ### `StickerPrinter` Methods
 
 | Method | Returns | Description |
 |---|---|---|
 | `renderToCanvas(layout, data, canvas)` | `Promise<void>` | Render a single label onto an existing HTML Canvas element |
-| `renderToDataURL(layout, data, options?)` | `Promise<string>` | Export as a data URL string — use as `<img src>` or pass to canvas. Supports `png`, `jpeg`, `webp`. |
-| `exportToPNG(layout, data, options?)` | `Promise<Blob>` | Export a single label as a PNG `Blob` — ideal for download or the File API |
-| `exportImages(layout, dataList, options?)` | `Promise<string[]>` | Batch-export multiple records as data URL strings (one per record) |
+| `renderToDataURL(layout, data, options?)` | `Promise<string>` | Export as a data URL string. Supports `png`, `jpeg`, `webp`. |
+| `exportToPNG(layout, data, options?)` | `Promise<Blob>` | Export a single label as a PNG Blob |
+| `exportImages(layout, dataList, options?)` | `Promise<string[]>` | Batch-export multiple records as data URL strings |
 | `exportToPDF(layout, dataList)` | `Promise<jsPDF>` | Batch-export all records as a multi-page PDF. Requires `jspdf`. |
-| `exportToZPL(layout, dataList, options?)` | `string[]` | Batch-export all records as ZPL strings. Pass `{ dpi: 300 }` to match your printer's resolution. Supports `qrErrorCorrection` and automatic `^`/`~` escaping. |
+| `exportToZPL(layout, dataList, options?)` | `string[]` | Batch-export all records as ZPL strings |
 
 ---
 
-## 🎯 Common Use Cases
+## Use Cases
 
 | Industry | Application |
 | :--- | :--- |
@@ -299,19 +262,25 @@ console.log(zpl300[0]); // ^XA ... ^PW... ^LL... ^FO... ^XZ
 
 ---
 
-## 🔗 Related
+## Related
 
 - **[`qrlayout-ui`](../ui/README.md)** — The visual drag-and-drop designer built on top of this engine
 - **[GitHub Repository](https://github.com/shashi089/qr-code-label-designer)** — Full monorepo, examples, and issue tracker
 
 ---
 
-## 📄 License
+## 🤝 Contributors
+
+- [@JayanthVishnu](https://github.com/JayanthVishnu)
+- [@arun270892](https://github.com/arun270892)
+
+---
+
+## License
 
 MIT © [Shashidhar Naik](https://github.com/shashi089)
 
 ---
 
-<p align="center">
-  <b>Found this useful? Please ⭐ the <a href="https://github.com/shashi089/qr-code-label-designer">GitHub repository</a> — it helps others discover the project!</b>
-</p>
+> Found this useful? Please [⭐ star the repository](https://github.com/shashi089/qr-code-label-designer) — it helps others discover the project!
+

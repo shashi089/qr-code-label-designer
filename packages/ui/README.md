@@ -14,9 +14,7 @@ Part of the [QR Layout Tool](https://github.com/shashi089/qr-code-label-designer
 
 ---
 
-## 🚀 Live Demos & Examples
-
-Try the designer — no signup needed:
+## Live Demos
 
 | Framework | Live Demo | Source Code |
 | :--- | :--- | :--- |
@@ -29,27 +27,26 @@ Try the designer — no signup needed:
 
 ---
 
-## ✨ Features
+## Features
 
-- **Framework Independent**: Built with vanilla TypeScript — mount it inside React, Vue, Angular, Svelte, or a plain HTML page.
-- **Drag & Drop Designer**: Visual placement and resizing of text and QR code elements on a canvas.
-- **Live Preview**: Preview your label with real sample data as you design.
-- **Data Binding**: Bind any field like `{{name}}`, `{{id}}`, or `{{department}}` from your entity schema.
-- **Multi-Variable QR**: Set a separator (e.g. `|`) on QR elements to automatically join multiple fields into one scan.
-- **Rich Text Styling**: Customize font size, weight, and horizontal/vertical alignment directly in the designer. Font family, color, word-wrap, and line height are supported by the engine and can be set via JSON (`initialLayout` or saved layout) — see the [core README](../core/README.md#stickerelement-schema) for all style properties.
-- **Undo / Redo**: 20-step history with Ctrl+Z / Ctrl+Y keyboard shortcuts and header buttons.
-- **Keyboard Shortcuts**: Delete/Backspace removes element, Arrow keys nudge 1 unit, Shift+Arrow nudges 5 units, Ctrl+D duplicates, Escape deselects.
-- **Label Size Presets**: Dropdown with 7 common sizes (Badge 100×60 mm, Shipping Label 4"×6", Brother QL, and more) — resets inputs on apply.
-- **Snap-to-Grid**: Optional 1-unit grid snapping for drag and resize, with a live dot-grid overlay on the canvas.
-- **Element Alignment Toolbar**: 6 icon buttons (Align Left / Center / Right | Top / Center / Bottom) in the property panel — all recorded in the undo stack.
-- **Dark Mode**: Built-in light and dark themes that follow your app's color scheme.
-- **Flexible Units**: Design in millimeters, centimeters, inches, or pixels.
-- **JSON Output**: Save the layout as a compact JSON object to your backend or `localStorage`.
-- **Rendering via `qrlayout-core`**: The same layout JSON drives PNG, PDF, and ZPL export — design once, output anywhere.
+- **Framework Independent** — Built with vanilla TypeScript; mount inside React, Vue, Angular, Svelte, or a plain HTML page.
+- **Drag & Drop Designer** — Visual placement and resizing of text, QR, and barcode elements on a canvas.
+- **Live Preview** — Preview your label with real sample data as you design.
+- **Data Binding** — Bind any field like `{{name}}`, `{{id}}`, or `{{department}}` from your entity schema.
+- **Multi-Variable QR** — Set a separator (e.g. `|`) on QR elements to automatically join multiple fields into one scan.
+- **Rich Text Styling** — Font size, weight, and alignment in the designer; color, font family, word-wrap, and line height via JSON.
+- **Undo / Redo** — 20-step history with Ctrl+Z / Ctrl+Y.
+- **Keyboard Shortcuts** — Delete, Arrow nudge, Shift+Arrow ×5, Ctrl+D duplicate, Escape.
+- **Label Size Presets** — Common shipping, badge, and tag sizes built in.
+- **Snap-to-Grid** — Optional 1-unit grid snapping for drag and resize.
+- **Element Alignment Toolbar** — 6 directions (left / center / right / top / center / bottom).
+- **Dark Mode** — Built-in light and dark themes.
+- **Flexible Units** — Design in mm, cm, in, or px.
+- **JSON Output** — Save the layout as a compact JSON object to your backend or `localStorage`.
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install qrlayout-ui qrlayout-core
@@ -57,17 +54,15 @@ npm install qrlayout-ui qrlayout-core
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### Step 1 — Import the CSS
-
-Add this to your project's entry point (e.g., `main.ts`, `index.js`, `App.tsx`):
+Import the CSS in your project's entry point:
 
 ```javascript
 import "qrlayout-ui/style.css";
 ```
 
-### Step 2 — Mount the Designer
+Mount the designer:
 
 ```typescript
 import { QRLayoutDesigner } from "qrlayout-ui";
@@ -75,7 +70,6 @@ import { QRLayoutDesigner } from "qrlayout-ui";
 const designer = new QRLayoutDesigner({
   element: document.getElementById("designer-container"),
 
-  // Optional: entity schema for {{variable}} data binding
   entitySchemas: {
     employee: {
       label: "Employee",
@@ -92,47 +86,24 @@ const designer = new QRLayoutDesigner({
     }
   },
 
-  // Optional: load an existing saved layout
-  initialLayout: {
-    id: "1",
-    name: "My Badge",
-    targetEntity: "employee",
-    width: 100,
-    height: 60,
-    unit: "mm",
-    backgroundColor: "#ffffff",
-    elements: []
-  },
+  initialLayout: savedLayout, // optional — pre-load an existing layout
 
-  // Fires when the user clicks "Save Layout"
   onSave: (layout) => {
     localStorage.setItem("my-layout", JSON.stringify(layout));
-    console.log("Layout saved:", layout);
   }
 });
 ```
 
-### Step 3 — Size the Container
-
-The designer fills 100% of its parent element. Give the container a fixed size:
+The designer fills 100% of its parent element — give the container a fixed size:
 
 ```css
 #designer-container {
   width: 100%;
-  height: 100vh;   /* full-screen */
+  height: 100vh;
 }
 ```
 
-Or embed it inside a modal/panel:
-
-```css
-#designer-container {
-  width: 100%;
-  height: 700px;
-}
-```
-
-### Step 4 — Cleanup on Unmount
+Clean up when done:
 
 ```javascript
 designer.destroy();
@@ -140,7 +111,7 @@ designer.destroy();
 
 ---
 
-## ⚙️ Options Reference
+## Options
 
 | Option | Type | Required | Description |
 |---|---|---|---|
@@ -151,38 +122,16 @@ designer.destroy();
 
 ---
 
-## 💾 Layout Persistence & Printing Workflow
+## Layout Persistence & Printing
 
-The `onSave` callback gives you the complete layout as a **plain JSON object**. That JSON is your single source of truth — store it anywhere, load it back anytime, and pass it with real data to `qrlayout-core` for printing.
+The `onSave` callback gives you the complete layout as a plain JSON object. Store it anywhere, load it back anytime, and pass it with real data to `qrlayout-core` for printing.
 
-### The Full Cycle
-
-```
-  ┌──────────────────────┐
-  │   qrlayout-ui        │  ← User designs the label visually
-  │   (Designer)         │
-  └──────────┬───────────┘
-             │ onSave(layout JSON)
-             ▼
-  ┌──────────────────────┐
-  │   Your Backend /     │  ← Save layout JSON to your DB, file, or localStorage
-  │   Database           │
-  └──────────┬───────────┘
-             │ Load layout JSON + real employee/machine data
-             ▼
-  ┌──────────────────────┐
-  │   qrlayout-core      │  ← Merge data into template, export PNG / PDF / ZPL
-  │   (StickerPrinter)   │
-  └──────────────────────┘
-```
-
-### Step 1 — Save the Layout to Your Database
+### Save the layout
 
 ```typescript
 const designer = new QRLayoutDesigner({
   element: document.getElementById("designer"),
   onSave: async (layout) => {
-    // layout is a plain JSON object — save it wherever you like
     await fetch("/api/layouts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -192,32 +141,29 @@ const designer = new QRLayoutDesigner({
 });
 ```
 
-### Step 2 — Load the Layout Back (with `initialLayout`)
+### Load a saved layout
 
 ```typescript
-// Fetch a saved layout from your backend
 const saved = await fetch("/api/layouts/employee-badge").then(r => r.json());
 
 const designer = new QRLayoutDesigner({
   element: document.getElementById("designer"),
-  initialLayout: saved,   // ← the JSON you saved earlier
+  initialLayout: saved,
   onSave: (layout) => { /* update in DB */ }
 });
 ```
 
-### Step 3 — Print with Real Data (via `qrlayout-core`)
+### Print with real data
 
 ```typescript
 import { StickerPrinter } from "qrlayout-core";
 import { exportToPDF } from "qrlayout-core/pdf"; // requires: npm install jspdf
 
 const printer = new StickerPrinter();
-
-// Fetch layout + real records from your backend
 const layout  = await fetch("/api/layouts/employee-badge").then(r => r.json());
 const records = await fetch("/api/employees").then(r => r.json());
 
-// ── PNG — one file per record (Blob download) ─────────────────
+// PNG — one file per record
 for (const record of records) {
   const blob = await printer.exportToPNG(layout, record);
   const url  = URL.createObjectURL(blob);
@@ -226,26 +172,17 @@ for (const record of records) {
   URL.revokeObjectURL(url);
 }
 
-// ── PDF — all records in one file ────────────────────────────
+// PDF — all records in one file
 const pdf = await printer.exportToPDF(layout, records);
 pdf.save("batch-badges.pdf");
 
-// ── ZPL — for Zebra / thermal printers ───────────────────────
+// ZPL — for Zebra / thermal printers
 const zplPages = printer.exportToZPL(layout, records);
-// Send zplPages[0] to your thermal printer via socket or API
 ```
 
 ---
 
-> [!NOTE]
-> **About the live demo applications** — The demo apps ([React](https://qr-layout-designer.netlify.app/), [Angular](https://qr-layout-designer-angular-demo.netlify.app/), [Svelte](https://qr-layout-designer-svelte.netlify.app/), [Vue](https://qr-layout-designer-vue.netlify.app/)) ship with a small set of **pre-built sample layouts and employee/machine records** so you can explore all features immediately without any setup.
->
-> All demo data is stored **exclusively in your browser's `localStorage`**. Nothing is sent to or stored on any server. Clearing your browser storage resets the demo to its defaults. Your designs and data never leave your browser.
-
----
-
-## 🔌 Integration Examples
-
+## Integration Examples
 
 ### React (TypeScript)
 
@@ -259,19 +196,15 @@ const LabelDesigner = () => {
 
   useEffect(() => {
     if (!containerRef.current) return;
-
     const designer = new QRLayoutDesigner({
       element: containerRef.current,
       onSave: (layout) => console.log('Saved:', layout)
     });
-
     return () => designer.destroy();
   }, []);
 
   return <div ref={containerRef} style={{ width: '100%', height: '100vh' }} />;
 };
-
-export default LabelDesigner;
 ```
 
 ### Vue 3 (Composition API)
@@ -291,10 +224,7 @@ onMounted(() => {
     onSave: (layout) => console.log('Saved:', layout)
   });
 });
-
-onUnmounted(() => {
-  if (designer) designer.destroy();
-});
+onUnmounted(() => designer?.destroy());
 </script>
 
 <template>
@@ -302,7 +232,7 @@ onUnmounted(() => {
 </template>
 ```
 
-### Angular (v17+ Standalone Component)
+### Angular (v17+ Standalone)
 
 ```typescript
 import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
@@ -324,10 +254,7 @@ export class LabelDesignerComponent implements OnInit, OnDestroy {
       onSave: (layout) => console.log('Saved:', layout)
     });
   }
-
-  ngOnDestroy() {
-    this.designer?.destroy();
-  }
+  ngOnDestroy() { this.designer?.destroy(); }
 }
 ```
 
@@ -340,17 +267,14 @@ export class LabelDesignerComponent implements OnInit, OnDestroy {
   import 'qrlayout-ui/style.css';
 
   let container = $state<HTMLDivElement | null>(null);
-  let designer: QRLayoutDesigner | null = null;
 
   onMount(() => {
     if (!container) return;
-
-    designer = new QRLayoutDesigner({
+    const designer = new QRLayoutDesigner({
       element: container,
       onSave: (layout) => console.log('Saved:', layout)
     });
-
-    return () => designer?.destroy();
+    return () => designer.destroy();
   });
 </script>
 
@@ -364,21 +288,15 @@ export class LabelDesignerComponent implements OnInit, OnDestroy {
 <html>
 <head>
   <link rel="stylesheet" href="node_modules/qrlayout-ui/dist/style.css">
-  <style>
-    #designer { width: 100%; height: 100vh; }
-  </style>
+  <style>#designer { width: 100%; height: 100vh; }</style>
 </head>
 <body>
   <div id="designer"></div>
-
   <script type="module">
     import { QRLayoutDesigner } from 'qrlayout-ui';
-
     const designer = new QRLayoutDesigner({
       element: document.getElementById('designer'),
-      onSave: (layout) => {
-        localStorage.setItem('layout', JSON.stringify(layout));
-      }
+      onSave: (layout) => localStorage.setItem('layout', JSON.stringify(layout))
     });
   </script>
 </body>
@@ -387,19 +305,25 @@ export class LabelDesignerComponent implements OnInit, OnDestroy {
 
 ---
 
-## 🔗 Related
+## Related
 
 - **[`qrlayout-core`](../core/README.md)** — Use the same layout JSON to render PNG, PDF, or ZPL without the UI
 - **[GitHub Repository](https://github.com/shashi089/qr-code-label-designer)** — Full monorepo, issue tracker, and discussions
 
 ---
 
-## 📄 License
+## 🤝 Contributors
+
+- [@JayanthVishnu](https://github.com/JayanthVishnu)
+- [@arun270892](https://github.com/arun270892)
+
+---
+
+## License
 
 MIT © [Shashidhar Naik](https://github.com/shashi089)
 
 ---
 
-<p align="center">
-  <b>If this saved you time, please ⭐ the <a href="https://github.com/shashi089/qr-code-label-designer">GitHub repository</a> — it helps others find the project!</b>
-</p>
+> Found this useful? Please [⭐ star the repository](https://github.com/shashi089/qr-code-label-designer) — it helps others discover the project!
+
