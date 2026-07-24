@@ -1,6 +1,6 @@
 {
   "name": "qrlayout-ui",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Embeddable drag-and-drop QR label designer — works in React, Vue, Svelte, Angular and vanilla JS. Pairs with qrlayout-core.",
   "keywords": [
     "qr-code",
@@ -78,10 +78,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "qrlayout-core": "^1.1.8"
+    "qrlayout-core": "^1.1.9"
   },
   "peerDependencies": {
-    "qrlayout-core": ">=1.1.8"
+    "qrlayout-core": ">=1.1.9"
   },
   "devDependencies": {
     "typescript": "^5.3.3",

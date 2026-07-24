@@ -1,6 +1,6 @@
 {
   "name": "qrlayout-core",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Headless QR code label rendering engine — generate ZPL, PDF, PNG layouts from JSON. Works in browser and Node.js.",
   "keywords": [
     "qr-code",

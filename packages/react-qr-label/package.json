@@ -1,6 +1,6 @@
 {
   "name": "react-qr-label",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "An embeddable, visual drag-and-drop QR label designer for React. Generate layouts and export to PDF, PNG, and ZPL formats.",
   "keywords": [
     "react",
@@ -72,8 +72,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "qrlayout-core": "^1.1.8",
-    "qrlayout-ui": "^1.1.1"
+    "qrlayout-core": "^1.1.9",
+    "qrlayout-ui": "^1.1.2"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

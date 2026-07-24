@@ -68,8 +68,8 @@
     "dev": "vite build --watch"
   },
   "dependencies": {
-    "qrlayout-core": "^1.1.8",
-    "qrlayout-ui": "^1.1.1"
+    "qrlayout-core": "^1.1.9",
+    "qrlayout-ui": "^1.1.2"
   },
   "peerDependencies": {
     "vue": ">=3.0.0"
