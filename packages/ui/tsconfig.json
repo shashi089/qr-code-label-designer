@@ -6,7 +6,10 @@
     "lib": ["ES2020", "DOM"],
     "jsx": "react-jsx",
     "strict": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "qrlayout-core": ["../core/src/index.ts"]
+    }
   },
   "include": ["src"]
 }

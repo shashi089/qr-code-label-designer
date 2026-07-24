@@ -3,6 +3,7 @@ import "./styles.css";
 
 export { StickerPrinter };
 export type { StickerLayout, StickerElement };
+export type { BarcodeFormat } from "qrlayout-core";
 
 interface DesignerLayout extends StickerLayout {
     targetEntity?: string;
