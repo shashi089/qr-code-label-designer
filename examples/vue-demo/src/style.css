@@ -1,40 +1,69 @@
-@import 'tailwindcss';
-@plugin '@tailwindcss/forms';
-@plugin '@tailwindcss/typography';
-@import 'qrlayout-ui/style.css';
+@import "tailwindcss";
 
-/* Utility for hiding scrollbar visually but allowing scroll */
-.hide-scrollbar {
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;
+  overflow-x: hidden;
 }
 
+#app {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.designer-container {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari and Opera */
+  display: none;
 }
 
 /* Designer Mobile Overrides */
 @media (max-width: 640px) {
+  .qrlayout-designer .sidebar,
+  .qrlayout-designer .sidebar-right {
+    max-width: calc(100% - 48px) !important;
+    width: calc(100% - 48px) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    height: calc(100% - 70px) !important;
+    top: 60px !important;
+  }
 
-    .qrlayout-designer .sidebar,
-    .qrlayout-designer .sidebar-right {
-        max-width: calc(100% - 48px) !important;
-        width: calc(100% - 48px) !important;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: 12px !important;
-        height: calc(100% - 70px) !important;
-        top: 60px !important;
-    }
+  .qrlayout-designer .sidebar {
+    left: 8px !important;
+  }
 
-    .qrlayout-designer .sidebar {
-        left: 8px !important;
-    }
-
-    .qrlayout-designer .sidebar-right {
-        right: 8px !important;
-    }
+  .qrlayout-designer .sidebar-right {
+    right: 8px !important;
+  }
 }

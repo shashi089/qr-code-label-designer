@@ -56,6 +56,11 @@
       "import": "./dist/vue-qr-label.js",
       "require": "./dist/vue-qr-label.cjs"
     },
+    "./pdf": {
+      "types": "./dist/pdf.d.ts",
+      "import": "./dist/pdf.js",
+      "require": "./dist/pdf.cjs"
+    },
     "./style.css": "./dist/vue-qr-label.css"
   },
   "files": [
@@ -64,12 +69,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch"
   },
   "dependencies": {
-    "qrlayout-core": "^1.1.9",
-    "qrlayout-ui": "^1.1.4"
+    "qrlayout-core": "^1.1.10",
+    "qrlayout-ui": "^1.1.5"
   },
   "peerDependencies": {
     "vue": ">=3.0.0"

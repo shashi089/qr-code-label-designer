@@ -9,7 +9,9 @@
     "skipLibCheck": true,
     "paths": {
       "qrlayout-ui": ["../ui/src/index.ts"],
-      "qrlayout-core": ["../core/src/index.ts"]
+      "qrlayout-core": ["../core/src/index.ts"],
+      "qrlayout-core/pdf": ["../core/src/pdf.ts"],
+      "qrlayout-core/*": ["../core/src/*"]
     }
   },
   "include": ["src"]

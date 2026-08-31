@@ -1,137 +1,196 @@
-<script setup lang="ts" generic="T">
-import { computed } from 'vue';
+<script setup lang="ts" generic="T extends Record<string, any>">
+import { computed, ref, watch } from 'vue';
 import { Edit2, Trash2 } from 'lucide-vue-next';
 
 export interface Column<T> {
-    header: string;
-    accessorKey?: keyof T;
-    id?: string;
-    class?: string;
+  header: string;
+  accessorKey: keyof T;
+  render?: (value: any, item: T) => string;
 }
 
-const props = defineProps<{
-    data: T[];
-    columns: Column<T>[];
-    keyField: keyof T;
-    selectedIds?: string[];
-}>();
+interface Props {
+  data: T[];
+  columns: Column<T>[];
+  keyField: keyof T;
+  selectedIds?: string[];
+  showActions?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  selectedIds: () => [],
+  showActions: true
+});
 
 const emit = defineEmits<{
-    (e: 'update:selectedIds', value: string[]): void;
+  (e: 'edit', item: T): void;
+  (e: 'delete', item: T): void;
+  (e: 'update:selectedIds', selectedIds: string[]): void;
+  (e: 'selectionChange', selectedIds: string[]): void;
 }>();
 
-// Selection Logic
-const isSelectionEnabled = computed(() => props.selectedIds !== undefined);
-const allIds = computed(() => props.data.map(d => String(d[props.keyField])));
-const isAllSelected = computed(() => {
-    return isSelectionEnabled.value && props.selectedIds?.length === props.data.length && props.data.length > 0;
+const headerCheckboxRef = ref<HTMLInputElement | null>(null);
+
+const allIds = computed<string[]>(() => props.data.map((d: T) => String(d[props.keyField])));
+const isAllSelected = computed<boolean>(() => {
+  return props.data.length > 0 && props.selectedIds.length === props.data.length;
 });
-const isIndeterminate = computed(() => {
-    const len = props.selectedIds?.length || 0;
-    return isSelectionEnabled.value && len > 0 && len < props.data.length;
+const isIndeterminate = computed<boolean>(() => {
+  return props.selectedIds.length > 0 && props.selectedIds.length < props.data.length;
+});
+
+watch(isIndeterminate, (val: boolean) => {
+  if (headerCheckboxRef.value) {
+    headerCheckboxRef.value.indeterminate = val;
+  }
 });
 
 function handleSelectAll(e: Event) {
-    const checked = (e.target as HTMLInputElement).checked;
-    if (checked) {
-        emit('update:selectedIds', allIds.value);
-    } else {
-        emit('update:selectedIds', []);
-    }
+  const target = e.target as HTMLInputElement;
+  const newSelection = target.checked ? [...allIds.value] : [];
+  emit('update:selectedIds', newSelection);
+  emit('selectionChange', newSelection);
 }
 
 function handleSelectRow(id: string, checked: boolean) {
-    if (!props.selectedIds) return;
-    let newSelection = [...props.selectedIds];
-    if (checked) {
-        newSelection.push(id);
-    } else {
-        newSelection = newSelection.filter(i => i !== id);
-    }
-    emit('update:selectedIds', newSelection);
+  let newSelection: string[];
+  if (checked) {
+    newSelection = [...props.selectedIds, id];
+  } else {
+    newSelection = props.selectedIds.filter((selectedId: string) => selectedId !== id);
+  }
+  emit('update:selectedIds', newSelection);
+  emit('selectionChange', newSelection);
 }
 
-// Custom directive for indeterminate state isn't strictly needed in Vue 3 script setup if we use :indeterminate prop (if supported) or ref
-// But HTML input element needs `.indeterminate` property set via JS.
-const vIndeterminate = {
-  updated(el: HTMLInputElement, binding: any) {
-    el.indeterminate = binding.value;
-  },
-  mounted(el: HTMLInputElement, binding: any) {
-    el.indeterminate = binding.value;
-  }
+function isRowSelected(id: string): boolean {
+  return props.selectedIds.includes(id);
 }
 </script>
 
 <template>
-    <div v-if="data.length === 0" class="flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-dashed border-gray-200">
-        <div class="p-4 bg-gray-50 rounded-full mb-3">
-             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-        </div>
-        <p class="text-gray-500 font-medium text-lg">No records found</p>
-        <p class="text-gray-400 text-sm">Add a new item to get started</p>
+  <div>
+    <div v-if="data.length === 0" class="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
+      <p class="text-gray-500">No records found</p>
     </div>
 
-    <div v-else class="overflow-x-auto bg-white shadow-xl shadow-gray-200/50 rounded-2xl border border-gray-100 ring-1 ring-black/5">
-        <table class="w-full text-left border-collapse min-w-[800px] lg:min-w-max">
-            <thead>
-                <tr class="bg-gray-50/80 border-b border-gray-200">
-                    <th v-if="isSelectionEnabled" class="px-6 py-4 w-12">
-                        <input
-                            type="checkbox"
-                            class="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer transition-colors"
-                            :checked="isAllSelected"
-                            v-indeterminate="isIndeterminate"
-                            @change="handleSelectAll"
-                        />
-                    </th>
-                    <th v-for="col in columns" :key="col.header" class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap" :class="col.class || ''">
-                        {{ col.header }}
-                    </th>
-                    <th v-if="$attrs.onEdit || $attrs.onDelete" class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 text-right whitespace-nowrap">
-                        Actions
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                <tr v-for="item in data" :key="String(item[keyField])" 
-                    class="group transition-all duration-200 hover:bg-gray-50/60"
-                    :class="{ 'bg-teal-50/40 hover:bg-teal-50/60': selectedIds?.includes(String(item[keyField])) }"
+    <div v-else class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+      <!-- Table View - Hidden on mobile, shown on md+ -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider">
+            <tr>
+              <th class="px-6 py-3 border-b border-gray-200 w-10">
+                <input
+                  ref="headerCheckboxRef"
+                  type="checkbox"
+                  class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                  :checked="isAllSelected"
+                  @change="handleSelectAll"
+                />
+              </th>
+              <th
+                v-for="(col, idx) in columns"
+                :key="idx"
+                class="px-6 py-3 font-semibold border-b border-gray-200"
+              >
+                {{ col.header }}
+              </th>
+              <th v-if="showActions" class="px-6 py-3 font-semibold border-b border-gray-200 text-right">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr
+              v-for="item in data"
+              :key="String(item[keyField])"
+              class="hover:bg-gray-50 transition-colors"
+              :class="{ 'bg-emerald-50/50': isRowSelected(String(item[keyField])) }"
+            >
+              <td class="px-6 py-4">
+                <input
+                  type="checkbox"
+                  class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                  :checked="isRowSelected(String(item[keyField]))"
+                  @change="(e: Event) => handleSelectRow(String(item[keyField]), (e.target as HTMLInputElement).checked)"
+                />
+              </td>
+              <td
+                v-for="(col, idx) in columns"
+                :key="idx"
+                class="px-6 py-4 text-sm text-gray-700"
+              >
+                <slot :name="`col-${String(col.accessorKey)}`" :item="item" :value="item[col.accessorKey]">
+                  {{ col.render ? col.render(item[col.accessorKey], item) : String(item[col.accessorKey] ?? '') }}
+                </slot>
+              </td>
+              <td v-if="showActions" class="px-6 py-4 text-right space-x-2">
+                <button
+                  @click="emit('edit', item)"
+                  class="text-emerald-600 hover:text-emerald-800 p-1.5 rounded-lg hover:bg-emerald-50 transition-colors cursor-pointer"
+                  title="Edit"
                 >
-                    <td v-if="isSelectionEnabled" class="px-6 py-4">
-                        <input
-                            type="checkbox"
-                            class="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer transition-colors"
-                            :checked="selectedIds?.includes(String(item[keyField]))"
-                            @change="(e) => handleSelectRow(String(item[keyField]), (e.target as HTMLInputElement).checked)"
-                        />
-                    </td>
-                    <td v-for="col in columns" :key="col.header" class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                        <slot name="cell" :item="item" :column="col">
-                            <span v-if="col.accessorKey">{{ item[col.accessorKey] }}</span>
-                            <span v-else class="text-gray-400">--</span>
-                        </slot>
-                    </td>
-                    <td v-if="$attrs.onEdit || $attrs.onDelete" class="px-6 py-4 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                            <button v-if="$attrs.onEdit"
-                                @click="($attrs.onEdit as Function)(item)"
-                                class="text-teal-600 hover:text-teal-900 p-1.5 rounded-lg hover:bg-teal-50 transition-colors cursor-pointer"
-                                title="Edit"
-                            >
-                                <Edit2 :size="16" />
-                            </button>
-                            <button v-if="$attrs.onDelete"
-                                @click="($attrs.onDelete as Function)(item)"
-                                class="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
-                                title="Delete"
-                            >
-                                <Trash2 :size="16" />
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
+                  <Edit2 :size="16" />
+                </button>
+                <button
+                  @click="emit('delete', item)"
+                  class="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                  title="Delete"
+                >
+                  <Trash2 :size="16" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
         </table>
+      </div>
+
+      <!-- Mobile Card View - Shown on small screens, hidden on md+ -->
+      <div class="md:hidden divide-y divide-gray-100">
+        <div
+          v-for="item in data"
+          :key="String(item[keyField])"
+          class="p-4"
+          :class="{ 'bg-emerald-50/50': isRowSelected(String(item[keyField])) }"
+        >
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex items-center gap-3">
+              <input
+                type="checkbox"
+                class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                :checked="isRowSelected(String(item[keyField]))"
+                @change="(e: Event) => handleSelectRow(String(item[keyField]), (e.target as HTMLInputElement).checked)"
+              />
+              <div class="flex flex-col gap-1">
+                <div
+                  v-for="(col, idx) in columns"
+                  :key="idx"
+                  :class="idx === 0 ? 'font-semibold text-gray-900' : 'text-sm text-gray-600'"
+                >
+                  <span v-if="idx > 0" class="text-gray-400 font-medium mr-1">{{ col.header }}:</span>
+                  <slot :name="`col-${String(col.accessorKey)}`" :item="item" :value="item[col.accessorKey]">
+                    {{ col.render ? col.render(item[col.accessorKey], item) : String(item[col.accessorKey] ?? '') }}
+                  </slot>
+                </div>
+              </div>
+            </div>
+            <div v-if="showActions" class="flex gap-1 shrink-0">
+              <button
+                @click="emit('edit', item)"
+                class="text-emerald-600 p-2 rounded-lg hover:bg-emerald-50 cursor-pointer"
+              >
+                <Edit2 :size="18" />
+              </button>
+              <button
+                @click="emit('delete', item)"
+                class="text-red-600 p-2 rounded-lg hover:bg-red-50 cursor-pointer"
+              >
+                <Trash2 :size="18" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </template>

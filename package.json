@@ -31,11 +31,13 @@
   "workspaces": [
     "packages/*",
     "examples/react-qr-label-demo",
-    "examples/svelte-qr-label-demo"
+    "examples/svelte-qr-label-demo",
+    "examples/vue-demo"
   ],
   "scripts": {
     "dev:ui": "npm --workspace packages/ui run dev",
     "dev:react": "npm --workspace examples/react-qr-label-demo run dev",
+    "dev:vue": "npm --workspace examples/vue-demo run dev",
     "dev:next": "npm --prefix examples/next-demo run dev",
     "build:core": "npm --workspace packages/core run build",
     "build:ui": "npm --workspace packages/ui run build",

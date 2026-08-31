@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
+    "target": "ES2020",
     "module": "ES2020",
     "moduleResolution": "Bundler",
-    "lib": ["ES2020", "DOM"],
-    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
     "strict": false,
     "skipLibCheck": true,
+    "rootDir": "src",
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "dist"
   },
-  "include": ["src"]
+  "include": ["src", "src/**/*.vue"]
 }
